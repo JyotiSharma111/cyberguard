@@ -10,6 +10,7 @@ const NAV = [
   { id: 'score',      label: 'Security Score',      icon: 'ti-chart-bar' },
   { section: 'Detection' },
   { id: 'uptime',       label: 'Uptime Monitor',         icon: 'ti-activity' },
+  { id: 'canary',       label: 'Ransomware Canary',      icon: 'ti-bug' },
   { id: 'threatalerts', label: 'Threat Alerts',         icon: 'ti-radar-2' },
   { id: 'threats',    label: 'Threat Detection',    icon: 'ti-radar' },
   { id: 'response',   label: 'Managed Response',    icon: 'ti-shield-check' },

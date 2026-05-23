@@ -27,6 +27,7 @@ import ThreatAlerts  from './pages/ThreatAlerts'
 import Documents     from './pages/Documents'
 import PhishingSim   from './pages/PhishingSim'
 import Uptime        from './pages/Uptime'
+import Canary        from './pages/Canary'
 import Landing         from './pages/Landing'
 import ResetPassword   from './pages/ResetPassword'
 import ShareView       from './pages/ShareView'
@@ -44,6 +45,7 @@ const PAGES = {
   documents:     Documents,
   phishing:      PhishingSim,
   uptime:        Uptime,
+  canary:        Canary,
 }
 
 function AppShell() {

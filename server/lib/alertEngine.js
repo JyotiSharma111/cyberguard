@@ -190,11 +190,77 @@ export async function sendAlert({ domain, alert, recipients, scanData }) {
       html,
     })
     console.log(`[alertEngine] Sent "${alert.type}" to ${recipients.join(', ')}`)
+
+    // Also send to Slack if webhook configured
+    if (alert.slackWebhook) {
+      await sendToSlack(alert.slackWebhook, domain, alert).catch(e =>
+        console.warn('[alertEngine] Slack failed:', e.message)
+      )
+    }
+
+    // Also send to Teams if webhook configured
+    if (alert.teamsWebhook) {
+      await sendToTeams(alert.teamsWebhook, domain, alert).catch(e =>
+        console.warn('[alertEngine] Teams failed:', e.message)
+      )
+    }
+
     return { sent: true, id: result.id }
   } catch (err) {
     console.error('[alertEngine] Send failed:', err.message)
     return { sent: false, error: err.message }
   }
+}
+
+async function sendToSlack(webhookUrl, domain, alert) {
+  const color = alert.type === 'new_critical' ? 'danger' : alert.type === 'score_drop' ? 'warning' : '#4FA6FF'
+  await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      text: `*🛡 CyberGuard — ${domain}*`,
+      attachments: [{
+        color,
+        title:   alert.subject,
+        text:    alert.detail,
+        footer:  'CyberGuard Security',
+        ts:      Math.floor(Date.now() / 1000),
+      }]
+    })
+  })
+  console.log('[alertEngine] Slack notification sent')
+}
+
+async function sendToTeams(webhookUrl, domain, alert) {
+  const color = alert.type === 'new_critical' ? 'FF4757' : alert.type === 'score_drop' ? 'FFB020' : '4FA6FF'
+  await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      "@type":    "MessageCard",
+      "@context": "http://schema.org/extensions",
+      themeColor: color,
+      summary:    alert.subject,
+      sections: [{
+        activityTitle:    `🛡 CyberGuard — ${domain}`,
+        activitySubtitle: new Date().toLocaleString(),
+        activityImage:    `${process.env.FRONTEND_URL ?? ''}/favicon.svg`,
+        facts: [
+          { name: "Alert",    value: alert.subject },
+          { name: "Severity", value: (alert.type ?? 'info').toUpperCase() },
+          { name: "Domain",   value: domain },
+          { name: "Detail",   value: alert.detail ?? '' },
+        ],
+        markdown: true,
+      }],
+      potentialAction: [{
+        "@type": "OpenUri",
+        name:    "Open CyberGuard Dashboard",
+        targets: [{ os: "default", uri: process.env.FRONTEND_URL ?? 'https://cyberguard-4f4.pages.dev' }]
+      }]
+    })
+  })
+  console.log('[alertEngine] Teams notification sent')
 }
 
 /**

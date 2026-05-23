@@ -31,6 +31,8 @@ export default function PhishingSim() {
   })
   const [sending, setSending] = useState(false)
   const [result, setResult]   = useState(null)
+  const [expandedCampaign, setExpandedCampaign] = useState(null)
+  const [recipients, setRecipients] = useState([])
 
   useEffect(() => {
     loadTemplates()
@@ -53,6 +55,14 @@ export default function PhishingSim() {
       .eq('user_id', state.user.id)
       .order('created_at', { ascending: false }).limit(20)
     setCampaigns(data ?? [])
+  }
+
+  async function loadRecipients(campaignId) {
+    const { data } = await supabase
+      .from('phishing_recipients').select('*')
+      .eq('campaign_id', campaignId)
+      .order('email', { ascending: true })
+    return data ?? []
   }
 
   async function launchCampaign() {
@@ -227,21 +237,66 @@ export default function PhishingSim() {
           {campaigns.length === 0 ? (
             <div style={{ padding:'16px 14px', fontFamily:'IBM Plex Mono,monospace', fontSize:11, color:'#3a4455' }}>No campaigns yet — launch your first simulation.</div>
           ) : (
-            campaigns.map(c => {
-              const ctr = c.sent_count > 0 ? Math.round(((c.click_count??0)/c.sent_count)*100) : 0
+            campaigns.map(camp => {
+              const ctr = camp.sent_count > 0 ? Math.round(((camp.click_count??0)/camp.sent_count)*100) : 0
+              const isExpanded = expandedCampaign === camp.id
               return (
-                <div key={c.id} style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borderBottom:'0.5px solid rgba(255,255,255,0.05)' }}>
-                  <div style={{ flex:1 }}>
-                    <div style={{ fontSize:12, fontWeight:500, color:'#dde2ed', marginBottom:2 }}>{c.name}</div>
-                    <div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:9, color:'#3a4455' }}>
-                      {new Date(c.created_at).toLocaleDateString()} · {c.template_id} · {c.sent_count} sent
+                <div key={camp.id}>
+                  {/* Campaign row */}
+                  <div
+                    onClick={async () => {
+                      if (isExpanded) { setExpandedCampaign(null); return }
+                      setExpandedCampaign(camp.id)
+                      const r = await loadRecipients(camp.id)
+                      setRecipients(r)
+                    }}
+                    style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borderBottom:'0.5px solid rgba(255,255,255,0.05)', cursor:'pointer' }}
+                    onMouseEnter={e=>e.currentTarget.style.background='rgba(255,255,255,0.02)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    <i className={`ti ti-chevron-${isExpanded?'up':'down'}`} style={{ fontSize:11, color:'#3a4455', flexShrink:0 }} aria-hidden="true"/>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:12, fontWeight:500, color:'#dde2ed', marginBottom:2 }}>{camp.name}</div>
+                      <div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:9, color:'#3a4455' }}>
+                        {new Date(camp.created_at).toLocaleDateString()} · {camp.template_id} · {camp.sent_count} sent
+                      </div>
+                    </div>
+                    <div style={{ display:'flex', gap:16, textAlign:'center' }}>
+                      <div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:13, fontWeight:600, color:'#dde2ed' }}>{camp.sent_count??0}</div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:8, color:'#3a4455' }}>sent</div></div>
+                      <div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:13, fontWeight:600, color:'#ffb627' }}>{camp.open_count??0}</div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:8, color:'#3a4455' }}>opened</div></div>
+                      <div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:13, fontWeight:600, color: ctr>20?'#ff4757':ctr>10?'#ffb627':'#00df78' }}>{ctr}%</div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:8, color:'#3a4455' }}>clicked</div></div>
                     </div>
                   </div>
-                  <div style={{ display:'flex', gap:16, textAlign:'center' }}>
-                    <div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:13, fontWeight:600, color:'#dde2ed' }}>{c.sent_count??0}</div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:8, color:'#3a4455' }}>sent</div></div>
-                    <div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:13, fontWeight:600, color:'#ffb627' }}>{c.open_count??0}</div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:8, color:'#3a4455' }}>opened</div></div>
-                    <div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:13, fontWeight:600, color: ctr>20?'#ff4757':ctr>10?'#ffb627':'#00df78' }}>{ctr}%</div><div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:8, color:'#3a4455' }}>clicked</div></div>
-                  </div>
+
+                  {/* Per-recipient breakdown */}
+                  {isExpanded && (
+                    <div style={{ background:'rgba(0,0,0,0.2)', borderBottom:'0.5px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ display:'grid', gridTemplateColumns:'1fr 80px 80px 80px 120px', gap:0, padding:'6px 14px 6px 48px', fontFamily:'IBM Plex Mono,monospace', fontSize:9, color:'#3a4455', borderBottom:'0.5px solid rgba(255,255,255,0.08)' }}>
+                        <span>EMAIL</span><span style={{textAlign:'center'}}>SENT</span><span style={{textAlign:'center'}}>OPENED</span><span style={{textAlign:'center'}}>CLICKED</span><span style={{textAlign:'center'}}>LAST EVENT</span>
+                      </div>
+                      {recipients.length === 0 ? (
+                        <div style={{ padding:'10px 48px', fontFamily:'IBM Plex Mono,monospace', fontSize:10, color:'#3a4455' }}>Loading recipients…</div>
+                      ) : (
+                        recipients.map(r => (
+                          <div key={r.id} style={{ display:'grid', gridTemplateColumns:'1fr 80px 80px 80px 120px', gap:0, padding:'7px 14px 7px 48px', borderBottom:'0.5px solid rgba(255,255,255,0.04)', alignItems:'center' }}>
+                            <span style={{ fontSize:11, color:'#dde2ed', fontFamily:'IBM Plex Mono,monospace' }}>{r.email}</span>
+                            <span style={{ textAlign:'center', fontSize:10, color:r.sent_at?'#00df78':'#3a4455' }}>
+                              {r.sent_at ? '✓' : '—'}
+                            </span>
+                            <span style={{ textAlign:'center', fontSize:10, color:r.opened_at?'#ffb627':'#3a4455' }}>
+                              {r.opened_at ? '✓' : '—'}
+                            </span>
+                            <span style={{ textAlign:'center', fontSize:10, color:r.clicked_at?'#ff4757':'#3a4455', fontWeight:r.clicked_at?600:400 }}>
+                              {r.clicked_at ? '⚠ YES' : '—'}
+                            </span>
+                            <span style={{ textAlign:'center', fontFamily:'IBM Plex Mono,monospace', fontSize:9, color:'#3a4455' }}>
+                              {r.clicked_at ? new Date(r.clicked_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) :
+                               r.opened_at  ? new Date(r.opened_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—'}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               )
             })

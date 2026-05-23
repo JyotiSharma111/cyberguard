@@ -26,6 +26,7 @@ import threatFeedRoutes    from './routes/threatfeed.js'
 import documentRoutes      from './routes/documents.js'
 import phishingRoutes      from './routes/phishing.js'
 import uptimeRoutes        from './routes/uptime.js'
+import canaryRoutes        from './routes/canary.js'
 
 const app  = express()
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
@@ -80,6 +81,7 @@ app.use('/api/threatfeed',   threatFeedRoutes)
 app.use('/api/documents',    documentRoutes)
 app.use('/api/phishing',     phishingRoutes)
 app.use('/api/uptime',       uptimeRoutes)
+app.use('/api/canary',       canaryRoutes)
 
 app.use(notFound)
 app.use(errorHandler)

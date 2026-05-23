@@ -20,6 +20,8 @@ const DEFAULT_SETTINGS = {
   weekly_digest:      true,
   channel_email:      true,
   channel_slack:      false,
+  channel_teams:      false,
+  teams_webhook_url:  '',
   slack_webhook_url:  '',
 }
 
@@ -236,6 +238,23 @@ export default function Settings() {
             <input value={settings.slack_webhook_url ?? ''}
               onChange={e => setSettings(prev => ({ ...prev, slack_webhook_url: e.target.value }))}
               placeholder="https://hooks.slack.com/services/T.../B.../..."
+              style={{ width:'100%', background:'#161c2a', border:'0.5px solid rgba(255,255,255,0.08)', borderRadius:7, padding:'9px 12px', fontSize:11, color:'#dde2ed', outline:'none', fontFamily:'IBM Plex Mono,monospace' }} />
+          </div>
+        )}
+      </Section>
+
+      {/* Teams webhook */}
+      <Section title="Microsoft Teams alerts (optional)" icon="ti-brand-teams" subtitle="Send alerts to a Teams channel via incoming webhook">
+        <CheckRow checked={settings.channel_teams ?? false} onChange={() => toggle('channel_teams')}
+          label="Send alerts to Teams" desc="Requires a Teams incoming webhook URL" />
+        {settings.channel_teams && (
+          <div style={{ marginTop:10 }}>
+            <div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:10, color:'#6b7789', marginBottom:6 }}>
+              Teams webhook URL — Channel → ⋯ → Connectors → Incoming Webhook → Configure → Copy URL
+            </div>
+            <input value={settings.teams_webhook_url ?? ''}
+              onChange={e => setSettings(prev => ({ ...prev, teams_webhook_url: e.target.value }))}
+              placeholder="https://outlook.office.com/webhook/..."
               style={{ width:'100%', background:'#161c2a', border:'0.5px solid rgba(255,255,255,0.08)', borderRadius:7, padding:'9px 12px', fontSize:11, color:'#dde2ed', outline:'none', fontFamily:'IBM Plex Mono,monospace' }} />
           </div>
         )}

@@ -24,7 +24,20 @@ router.post('/send', async (req, res, next) => {
         fromName, fromEmail,
       })
       results.push({ email: recipient.email, ...r })
-      if (!r.ok) console.error(`[phishing/send] Failed for ${recipient.email}:`, r.error)
+      if (!r.ok) {
+        console.error(`[phishing/send] Failed for ${recipient.email}:`, r.error)
+      } else if (recipient.id) {
+        // Mark recipient as sent
+        const SUPABASE_URL = process.env.SUPABASE_URL
+        const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY
+        if (SUPABASE_URL && SUPABASE_KEY) {
+          await fetch(`${SUPABASE_URL}/rest/v1/phishing_recipients?id=eq.${recipient.id}`, {
+            method: 'PATCH',
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ sent_at: new Date().toISOString() })
+          }).catch(() => {})
+        }
+      }
       await new Promise(r => setTimeout(r, 500)) // rate limit
     }
     const failCount = results.filter(r => !r.ok).length
