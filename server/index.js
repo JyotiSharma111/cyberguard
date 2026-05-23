@@ -84,7 +84,7 @@ app.use('/api/uptime',       uptimeRoutes)
 app.use(notFound)
 app.use(errorHandler)
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n✅ CyberGuard API v2.0 → http://localhost:${PORT}`)
   console.log(`   Scan:       GET /api/scan/:domain`)
   console.log(`   Vuln:       GET /api/vuln/:domain`)
