@@ -76,3 +76,18 @@ CREATE POLICY "phishing_recipients_own" ON public.phishing_recipients FOR ALL US
   EXISTS (SELECT 1 FROM public.phishing_campaigns c WHERE c.id = phishing_recipients.campaign_id AND c.user_id = auth.uid())
 );
 CREATE POLICY "assessments_own" ON public.assessments FOR ALL USING (auth.uid() = user_id);
+
+-- RPC functions for phishing counter increments
+CREATE OR REPLACE FUNCTION increment_phishing_click(campaign_id_input uuid)
+RETURNS void LANGUAGE sql AS $$
+  UPDATE public.phishing_campaigns
+  SET click_count = click_count + 1
+  WHERE id = campaign_id_input;
+$$;
+
+CREATE OR REPLACE FUNCTION increment_phishing_open(campaign_id_input uuid)
+RETURNS void LANGUAGE sql AS $$
+  UPDATE public.phishing_campaigns
+  SET open_count = open_count + 1
+  WHERE id = campaign_id_input;
+$$;

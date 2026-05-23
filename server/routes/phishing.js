@@ -37,15 +37,30 @@ router.post('/send', async (req, res, next) => {
 // Tracking endpoints — click and open pixel
 router.get('/track/click/:campaignId/:recipientId', async (req, res) => {
   const { campaignId, recipientId } = req.params
-  // Log the click to Supabase
   const SUPABASE_URL = process.env.SUPABASE_URL
   const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY
   if (SUPABASE_URL && SUPABASE_KEY) {
+    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
+
+    // Log the click event
     await fetch(`${SUPABASE_URL}/rest/v1/phishing_results`, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      method: 'POST', headers,
       body: JSON.stringify({ campaign_id: campaignId, recipient_id: recipientId, event: 'click', event_at: new Date().toISOString() })
     }).catch(() => {})
+
+    // Increment click_count using Supabase RPC
+    await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_phishing_click`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ campaign_id_input: campaignId })
+    }).catch(() => {})
+
+    // Update recipient clicked_at
+    if (recipientId && recipientId !== 'undefined') {
+      await fetch(`${SUPABASE_URL}/rest/v1/phishing_recipients?id=eq.${recipientId}`, {
+        method: 'PATCH', headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ clicked_at: new Date().toISOString() })
+      }).catch(() => {})
+    }
   }
   // Redirect to education page
   const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173'
@@ -57,12 +72,27 @@ router.get('/track/open/:campaignId/:recipientId', async (req, res) => {
   const SUPABASE_URL = process.env.SUPABASE_URL
   const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY
   if (SUPABASE_URL && SUPABASE_KEY) {
+    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
+
+    // Log the open event
     await fetch(`${SUPABASE_URL}/rest/v1/phishing_results`, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      method: 'POST', headers,
       body: JSON.stringify({ campaign_id: campaignId, recipient_id: recipientId, event: 'open', event_at: new Date().toISOString() })
     }).catch(() => {})
-  }
+
+    // Increment open_count using Supabase RPC
+    await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_phishing_open`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ campaign_id_input: campaignId })
+    }).catch(() => {})
+
+    // Update recipient opened_at
+    if (recipientId && recipientId !== 'undefined') {
+      await fetch(`${SUPABASE_URL}/rest/v1/phishing_recipients?id=eq.${recipientId}`, {
+        method: 'PATCH', headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ opened_at: new Date().toISOString() })
+      }).catch(() => {})
+    }
   // Return 1x1 transparent pixel
   const pixel = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64')
   res.set('Content-Type', 'image/gif').send(pixel)
