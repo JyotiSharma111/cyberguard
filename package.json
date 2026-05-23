@@ -1,0 +1,46 @@
+{
+  "name": "cyberguard",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "server:dev": "node --watch server/index.js",
+    "test": "node test/e2e.test.js",
+    "test:fast": "node test/e2e.test.js --fast",
+    "test:domain": "node test/e2e.test.js --domain",
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-config-service": "^3.1053.0",
+    "@aws-sdk/client-ec2": "^3.1053.0",
+    "@aws-sdk/client-iam": "^3.1053.0",
+    "@aws-sdk/client-s3": "^3.1053.0",
+    "@aws-sdk/client-sts": "^3.1053.0",
+    "@react-pdf/renderer": "^4.5.1",
+    "@supabase/supabase-js": "^2.106.0",
+    "clsx": "^2.1.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "https": "^1.0.0",
+    "lucide-react": "^0.454.0",
+    "net": "^1.0.2",
+    "node-fetch": "^2.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "recharts": "^2.12.7",
+    "resend": "^6.12.3",
+    "stripe": "^22.1.1",
+    "tls": "^0.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.8"
+  }
+}
