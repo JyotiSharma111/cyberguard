@@ -140,43 +140,70 @@ export default function Canary() {
       {/* How to run */}
       {script && (
         <Card title="How to run" titleIcon="ti-play">
-          <div style={{ padding:'14px', display:'flex', flexDirection:'column', gap:10 }}>
+          <div style={{ padding:'14px', display:'flex', flexDirection:'column', gap:12 }}>
+            {/* Persistence callout */}
+            <div style={{ background:'rgba(0,223,120,0.07)', border:'0.5px solid rgba(0,223,120,0.2)', borderRadius:8, padding:'10px 14px', fontSize:12, color:'#00df78', lineHeight:1.6 }}>
+              ✓ <strong>Persistent — survives closing this terminal.</strong>{' '}
+              {platform === 'windows'
+                ? 'The script installs itself as a Windows Scheduled Task. It auto-starts at every login and runs silently in the background.'
+                : 'The script installs itself as a macOS LaunchAgent. It auto-starts at every login and runs silently in the background.'}
+            </div>
+
             {platform === 'windows' ? (
               <>
-                <div style={{ fontSize:12, color:'#dde2ed', marginBottom:6 }}>Run in PowerShell as Administrator:</div>
+                <div style={{ fontSize:12, fontWeight:500, color:'#dde2ed' }}>Run once in PowerShell as Administrator:</div>
+                <div style={{ background:'#080b10', border:'0.5px solid rgba(255,255,255,0.08)', borderRadius:7, padding:'10px 12px', fontFamily:'IBM Plex Mono,monospace', fontSize:11, color:'#00df78', lineHeight:1.8 }}>
+                  # Step 1: Right-click Start → Windows PowerShell (Admin)<br/>
+                  # Step 2: Paste this command:<br/>
+                  Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force<br/>
+                  # Step 3: Drag the downloaded .ps1 file into the window and press Enter
+                </div>
                 {[
-                  'Right-click Start → Windows PowerShell (Admin)',
-                  'Drag and drop the downloaded .ps1 file into the PowerShell window',
-                  'Press Enter — canary files will be created on your Desktop, Documents, Downloads, and Pictures',
-                  'Leave the window open. It watches 24/7. Press Ctrl+C to stop.',
-                  'To run on startup: copy the script to shell:startup in File Explorer',
-                ].map((step, i) => (
-                  <div key={i} style={{ display:'flex', gap:10, fontSize:12, color:'#6b7789' }}>
-                    <span style={{ color:'#4fa6ff', fontFamily:'IBM Plex Mono,monospace', fontSize:10, flexShrink:0, marginTop:1 }}>{i+1}.</span>
-                    {step}
+                  ['✓', 'Creates decoy files in Desktop, Documents, Downloads, and Pictures', '#00df78'],
+                  ['✓', 'Installs as a Scheduled Task — runs at every Windows login automatically', '#00df78'],
+                  ['✓', 'You can close this window after running — monitoring continues in background', '#00df78'],
+                  ['→', 'If task install fails: run PowerShell as Administrator (right-click → Run as administrator)', '#ffb627'],
+                  ['→', 'To uninstall: open Task Scheduler → find "CyberGuard-Canary" → Delete', '#6b7789'],
+                ].map(([icon, text, color], i) => (
+                  <div key={i} style={{ display:'flex', gap:8, fontSize:12, color:'#6b7789', alignItems:'flex-start' }}>
+                    <span style={{ color, flexShrink:0, fontWeight:600 }}>{icon}</span>
+                    <span style={{ color }}>{text}</span>
                   </div>
                 ))}
               </>
             ) : (
               <>
-                <div style={{ fontSize:12, color:'#dde2ed', marginBottom:6 }}>Run in Terminal:</div>
-                <div style={{ background:'#080b10', border:'0.5px solid rgba(255,255,255,0.08)', borderRadius:7, padding:'8px 12px', fontFamily:'IBM Plex Mono,monospace', fontSize:11, color:'#00df78' }}>
+                <div style={{ fontSize:12, fontWeight:500, color:'#dde2ed' }}>Run once in Terminal:</div>
+                <div style={{ background:'#080b10', border:'0.5px solid rgba(255,255,255,0.08)', borderRadius:7, padding:'10px 12px', fontFamily:'IBM Plex Mono,monospace', fontSize:11, color:'#00df78', lineHeight:1.8 }}>
                   chmod +x ~/Downloads/cyberguard-canary.sh<br/>
-                  ~/Downloads/cyberguard-canary.sh
+                  sudo ~/Downloads/cyberguard-canary.sh
                 </div>
                 {[
-                  'The script creates canary files in Desktop, Documents, Downloads, and Pictures',
-                  'It runs in the foreground — keep Terminal open or run with nohup',
-                  'macOS requires fswatch (installed automatically via Homebrew if needed)',
-                  'If you close Terminal, the monitoring stops. For persistent monitoring, add to crontab or launchd.',
-                ].map((step, i) => (
-                  <div key={i} style={{ display:'flex', gap:10, fontSize:12, color:'#6b7789' }}>
-                    <span style={{ color:'#4fa6ff', fontFamily:'IBM Plex Mono,monospace', fontSize:10, flexShrink:0, marginTop:1 }}>→</span>
-                    {step}
+                  ['✓', 'Creates decoy files in Desktop, Documents, Downloads, and Pictures', '#00df78'],
+                  ['✓', 'Installs as a LaunchAgent — runs at every Mac login automatically', '#00df78'],
+                  ['✓', 'Close Terminal after running — monitoring continues in the background', '#00df78'],
+                  ['→', 'macOS requires fswatch — installed automatically via Homebrew if not present', '#ffb627'],
+                  ['→', 'View logs anytime: tail -f /tmp/cyberguard-canary.log', '#6b7789'],
+                  ['→', 'To uninstall: launchctl unload ~/Library/LaunchAgents/app.cyberguard.canary.plist', '#6b7789'],
+                ].map(([icon, text, color], i) => (
+                  <div key={i} style={{ display:'flex', gap:8, fontSize:12, alignItems:'flex-start' }}>
+                    <span style={{ color, flexShrink:0, fontWeight:600 }}>{icon}</span>
+                    <span style={{ color }}>{text}</span>
                   </div>
                 ))}
               </>
             )}
+
+            {/* What happens when triggered */}
+            <div style={{ background:'rgba(255,71,87,0.06)', border:'0.5px solid rgba(255,71,87,0.15)', borderRadius:8, padding:'10px 14px' }}>
+              <div style={{ fontSize:11, fontWeight:600, color:'#ff4757', marginBottom:6 }}>🚨 What happens when ransomware is detected</div>
+              <div style={{ fontSize:11, color:'#6b7789', lineHeight:1.7 }}>
+                1. Script detects canary file modification within seconds<br/>
+                2. Sends webhook to CyberGuard → alert appears in this dashboard<br/>
+                3. You receive an immediate email with: machine name, username, which file was touched, and step-by-step response instructions<br/>
+                4. <strong style={{ color:'#ffb627' }}>Action: immediately isolate the machine from your network (unplug ethernet / disable WiFi)</strong>
+              </div>
+            </div>
           </div>
         </Card>
       )}

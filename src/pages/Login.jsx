@@ -117,10 +117,10 @@ export default function Login({ defaultMode = 'login' }) {
 
       } else if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-          redirectTo: `${window.location.origin}/reset-password`,
+          redirectTo: `${window.location.origin}/`,
         })
         if (error) throw error
-        setMessage('Password reset email sent — check your inbox.')
+        setMessage('Password reset link sent to ' + email.trim() + ' — check your inbox and spam folder. Click the link in the email to set a new password.')
       }
     } catch (err) {
       setError(

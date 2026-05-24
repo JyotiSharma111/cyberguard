@@ -53,7 +53,7 @@ export default function Uptime() {
           note={current?.latencyMs ? `${current.latencyMs}ms response` : 'Run check first'}
           accent={isUp === null ? 'bl' : isUp ? 'gr' : 're'}
         />
-        <StatCard label="Uptime (24h)"   value={uptimePct !== null ? `${uptimePct}%` : '—'} note="Based on 5-min checks" accent={parseFloat(uptimePct)>=99?'gr':parseFloat(uptimePct)>=95?'am':'re'} />
+        <StatCard label="Uptime (24h)"   value={uptimePct != null ? `${uptimePct}%` : '—'} note="Based on 5-min checks" accent={uptimePct == null ? 'bl' : parseFloat(uptimePct)>=99?'gr':parseFloat(uptimePct)>=95?'am':'re'} />
         <StatCard label="Avg response"   value={avgLatency ? `${avgLatency}ms` : '—'}        note="Last 24 hours"        accent={avgLatency<500?'gr':avgLatency<2000?'am':'re'} />
         <StatCard label="Checks today"   value={loading ? '…' : checks.length}               note="5-minute interval"    accent="bl" />
       </Grid>
@@ -82,7 +82,7 @@ export default function Uptime() {
 
       {/* 24-hour timeline grid */}
       <Card title="24-hour uptime timeline" titleIcon="ti-timeline"
-        badge={uptimePct !== null ? `${uptimePct}% uptime` : 'No data yet'} badgeType={parseFloat(uptimePct)>=99?'ok':'warn'}>
+        badge={uptimePct != null ? `${uptimePct}% uptime` : 'No data yet'} badgeType={uptimePct == null ? 'bl' : parseFloat(uptimePct)>=99?'ok':'warn'}>
         <div style={{ padding:'14px 14px 10px' }}>
           <div style={{ display:'flex', gap:2, flexWrap:'wrap', marginBottom:8 }}>
             {last288.length === 0 ? (

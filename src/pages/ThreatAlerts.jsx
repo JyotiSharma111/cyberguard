@@ -38,6 +38,22 @@ export default function ThreatAlerts() {
 
   return (
     <div className="animate-fade-in" style={{ display:'flex', flexDirection:'column', gap:12, padding:16 }}>
+
+      {/* What this page is */}
+      <div style={{ background:'rgba(79,166,255,0.06)', border:'0.5px solid rgba(79,166,255,0.15)', borderRadius:8, padding:'12px 16px' }}>
+        <div style={{ fontSize:13, fontWeight:600, color:'#dde2ed', marginBottom:6, display:'flex', alignItems:'center', gap:6 }}>
+          <i className="ti ti-info-circle" style={{ color:'#4fa6ff', fontSize:14 }} aria-hidden="true"/>
+          What is this page?
+        </div>
+        <div style={{ fontSize:12, color:'#6b7789', lineHeight:1.8 }}>
+          This is a live feed of <strong style={{ color:'#dde2ed' }}>real cybersecurity threats happening right now</strong> — not specific to your domain, but relevant to your industry and software stack.<br/>
+          <strong style={{ color:'#ff4757' }}>CISA KEV</strong> = vulnerabilities the US government has confirmed are actively being exploited by attackers <em>today</em>. If you use the software listed, patch it immediately.<br/>
+          <strong style={{ color:'#ffb627' }}>AlienVault OTX</strong> = community threat intelligence — phishing campaigns, malware, malicious IPs reported by security researchers worldwide.<br/>
+          <strong style={{ color:'#4fa6ff' }}>NCSC</strong> = UK government advisories — guidance specific to UK businesses on current threats.<br/>
+          <strong style={{ color:'#00df78' }}>What to do:</strong> Scan the list weekly. If you see software you use (Windows, Exchange, Cisco, Fortinet, VMware), apply the patch immediately. Share critical alerts with your IT person or MSP.
+        </div>
+      </div>
+
       <Grid cols={4} gap={10}>
         <StatCard label="Threat alerts"  value={loading ? '…' : items.length}    note="Live feed"          accent="bl" />
         <StatCard label="Critical CVEs"  value={loading ? '…' : critical}         note="CISA KEV catalog"   accent={critical>0?'re':'gr'} />
@@ -111,6 +127,12 @@ export default function ThreatAlerts() {
                   {item.product && <span style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:9, color:'#3a4455' }}>· {item.product}</span>}
                   {item.date && <span style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:9, color:'#3a4455', marginLeft:'auto' }}>{new Date(item.date).toLocaleDateString()}</span>}
                 </div>
+                {/* Action guidance */}
+                {item.severity === 'critical' && (
+                  <div style={{ marginTop:6, fontFamily:'IBM Plex Mono,monospace', fontSize:9, color:'#ff4757', background:'rgba(255,71,87,0.07)', padding:'4px 8px', borderRadius:4, lineHeight:1.5 }}>
+                    ⚡ Action: Check if your systems use {item.vendor || 'this software'}. If yes — patch immediately or contact your IT provider.
+                  </div>
+                )}
               </div>
             </div>
           ))

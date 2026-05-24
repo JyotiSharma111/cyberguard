@@ -90,10 +90,29 @@ foreach ($watcher in $Watchers) {
   } | Out-Null
 }
 
-Write-Host "[CyberGuard] Monitoring active. Press Ctrl+C to stop."
-Write-Host "[CyberGuard] To run on startup: copy this script to your Startup folder"
+# Self-install as a scheduled task so it survives terminal close and reboots
+$TaskName = "CyberGuard-Canary"
+$ScriptDir = "$env:APPDATA\CyberGuard"
+$ScriptPath = "$ScriptDir\canary.ps1"
 
-# Keep running
+New-Item -ItemType Directory -Force -Path $ScriptDir | Out-Null
+Copy-Item -Path $PSCommandPath -Destination $ScriptPath -Force
+
+$Action   = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$ScriptPath`""
+$Trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+$Settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0
+
+try {
+  Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
+  Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -RunLevel Highest -Force | Out-Null
+  Write-Host "[CyberGuard] Installed as background task '$TaskName' — close this window safely"
+  Write-Host "[CyberGuard] Auto-starts at every login"
+  Write-Host "[CyberGuard] To uninstall: Unregister-ScheduledTask -TaskName '$TaskName' -Confirm:`$false"
+} catch {
+  Write-Host "[CyberGuard] Note: run as Administrator for persistent install. Running in foreground for now."
+}
+
+Write-Host "[CyberGuard] Canary monitoring active."
 while ($true) { Start-Sleep -Seconds 30 }
 `
 }
@@ -174,6 +193,38 @@ if [[ "$PLATFORM" == "macOS" ]]; then
     [ -d "$dir" ] && WATCH_PATHS+=("$dir/$CANARY_NAME")
   done
   
+  # Install as LaunchAgent for persistence (survives terminal close + reboots)
+  PLIST_DIR="$HOME/Library/LaunchAgents"
+  PLIST_FILE="$PLIST_DIR/app.cyberguard.canary.plist"
+  SCRIPT_DEST="$HOME/.cyberguard-canary.sh"
+  
+  mkdir -p "$PLIST_DIR"
+  cp "$0" "$SCRIPT_DEST"
+  chmod +x "$SCRIPT_DEST"
+  
+  cat > "$PLIST_FILE" << PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>app.cyberguard.canary</string>
+  <key>ProgramArguments</key>
+  <array><string>/bin/bash</string><string>$SCRIPT_DEST</string></array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/tmp/cyberguard-canary.log</string>
+  <key>StandardErrorPath</key><string>/tmp/cyberguard-canary.log</string>
+</dict>
+</plist>
+PLIST
+  
+  launchctl unload "$PLIST_FILE" 2>/dev/null
+  launchctl load "$PLIST_FILE"
+  echo "[CyberGuard] ✓ Installed as background service (LaunchAgent)"
+  echo "[CyberGuard] ✓ Runs automatically at login — close this terminal safely"
+  echo "[CyberGuard] ✓ To uninstall: launchctl unload $PLIST_FILE && rm $PLIST_FILE"
+  echo "[CyberGuard] Log: tail -f /tmp/cyberguard-canary.log"
+
   echo "[CyberGuard] Monitoring active (macOS/fswatch). Press Ctrl+C to stop."
   fswatch -0 "\${WATCH_PATHS[@]}" | while IFS= read -r -d "" file; do
     if [ -f "$file" ]; then
