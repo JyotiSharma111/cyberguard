@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Block internal app pages from indexing
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /account
+Disallow: /onboarding
+Disallow: /share/
+Disallow: /api/
+
+# Allow key landing pages
+Allow: /$
+Allow: /features
+Allow: /pricing
+
+Sitemap: https://cyberguard-4f4.pages.dev/sitemap.xml
+
+# Crawl delay for polite bots
+Crawl-delay: 10

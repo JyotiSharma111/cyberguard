@@ -142,7 +142,7 @@ export default function Vendor() {
       <Card title="Add a vendor to track" titleIcon="ti-plus">
         <div style={{ padding:'12px 14px' }}>
           <div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:10, color:'#6b7789', lineHeight:1.6, marginBottom:12 }}>
-            Enter any vendor's domain. CyberGuard scans their public DNS records, SSL certificate, and email authentication (SPF/DKIM/DMARC) and gives them a security grade — similar to how BitSight rates vendors, but free.
+            Enter any vendor's domain. CyberGuard scans their public DNS records, SSL certificate, and email authentication (SPF/DKIM/DMARC) and gives them a security grade from A+ to F.
           </div>
           <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
             <input value={newDomain} onChange={e => { setNewDomain(e.target.value); setAddError('') }}

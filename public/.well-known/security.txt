@@ -1,0 +1,5 @@
+Contact: mailto:security@cyberguard.app
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://cyberguard-4f4.pages.dev/.well-known/security.txt
+Policy: https://cyberguard-4f4.pages.dev/security-policy

@@ -43,8 +43,8 @@ const FAQS = [
     a:'9 checks on every scan: DNS records, SSL certificate, email authentication (SPF/DKIM/DMARC/BIMI), HTTP security headers, open ports via Shodan, subdomain discovery, WHOIS/domain expiry, credential breaches (HIBP), and domain reputation (VirusTotal). All passive — we never touch your servers.' },
   { q:'Does CyberGuard satisfy T-Mobile\'s vendor security requirement?',
     a:'Yes. CyberGuard covers cloud service monitoring (M365, AWS, GitHub, Cloudflare), 24/7 automated detection with instant email/Slack/Teams alerts, IRP generation, and ransomware canary scripts. Combined with naming yourself as on-call responder in your IRP, this satisfies T-Mobile\'s vendor incident management requirement under the "automated monitoring tools" option.' },
-  { q:'How is this different from Defendify?',
-    a:'CyberGuard covers 11 of Defendify\'s 13 modules for $49/month vs Defendify\'s $925-$2,950/month. The main difference: Defendify has a 24/7 human SOC team. CyberGuard uses automated monitoring with instant alerts — which is what T-Mobile actually requires. For most SMBs this saves $10,000+ per year.' },
+  { q:'How does this compare to enterprise security platforms?',
+    a:'Enterprise security platforms typically charge $900–$3,000/month and require a sales call, annual contract, and dedicated IT staff. CyberGuard covers the same technical controls at $49/month with instant self-serve signup. The main difference is enterprise platforms include a 24/7 human SOC team — CyberGuard uses automated monitoring with instant alerts, which satisfies most SMB compliance requirements including T-Mobile\'s vendor programme.' },
   { q:'Do I need to install anything?',
     a:'No. Everything is passive scanning of publicly available data. Add your domain, verify ownership with one DNS record, and we do the rest. The only optional install is a one-command ransomware canary script for your own machines.' },
   { q:'How is the free tier?',
@@ -57,7 +57,7 @@ const STATS = [
   { num:'9',    label:'Security scanners' },
   { num:'<90s', label:'Time to first scan' },
   { num:'$0',   label:'To get started' },
-  { num:'90%',  label:'Less than Defendify' },
+  { num:'90%',  label:'vs enterprise platforms' },
 ]
 
 export default function Landing() {
@@ -206,7 +206,7 @@ export default function Landing() {
       <div style={{ borderTop:'0.5px solid rgba(255,255,255,0.06)', borderBottom:'0.5px solid rgba(255,255,255,0.06)', padding:'14px 48px', display:'flex', alignItems:'center', justifyContent:'center', gap:40, background:'rgba(255,255,255,0.02)', flexWrap:'wrap' }}>
         {[
           '🔒 Used by T-Mobile vendors',
-          '📊 Competes with Defendify at 5% of the cost',
+          '📊 Enterprise-grade security at SMB pricing',
           '⚡ 9 scanners in one tool',
           '🌍 GDPR-conscious — EU-accessible',
         ].map((item, i) => (
@@ -255,7 +255,7 @@ export default function Landing() {
         <div style={{ background:'rgba(255,255,255,0.02)', border:'0.5px solid rgba(255,255,255,0.06)', borderRadius:12, overflow:'hidden' }}>
           {/* Header */}
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr', background:'rgba(255,255,255,0.04)' }}>
-            {['Feature', 'CyberGuard', 'Defendify', 'BitSight'].map((h, i) => (
+            {['Feature', 'CyberGuard', 'Full-service platforms', 'Vendor rating tools'].map((h, i) => (
               <div key={i} style={{ padding:'12px 16px', fontFamily:'IBM Plex Mono,monospace', fontSize:10, color: i===1?'#4fa6ff':'#6b7789', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.8px', borderRight: i<3 ? '0.5px solid rgba(255,255,255,0.06)' : 'none', textAlign: i===0?'left':'center' }}>
                 {h}
               </div>

@@ -1,6 +1,6 @@
 /**
  * CyberGuard Security Report Generator — v2
- * Inspired by BitSight: per-vector sections, grade distributions,
+ * Per-vector sections, grade distributions,
  * industry benchmarks, first/last seen findings, timeline charts.
  */
 
@@ -46,7 +46,7 @@ function progressBar(score, width = 200) {
   </div>`
 }
 
-// Grade distribution bar (like BitSight's stacked bar)
+// Grade distribution bar
 function gradeDistBar(findings) {
   if (!findings || findings.length === 0) {
     return `<div style="font-size:12px;color:#6b7280;font-style:italic">No findings</div>`
@@ -78,7 +78,7 @@ function sparkline(data, color = '#0284c7') {
   </svg>`
 }
 
-// Risk vector section — mirrors BitSight's layout
+// Risk vector section
 function riskSection(opts) {
   const { id, title, topPct, grade, description, findings = [], chartData, remediation = [], icon } = opts
   const g = scoreGrade(grade)
@@ -150,7 +150,7 @@ function riskSection(opts) {
   </div>`
 }
 
-// Convert our raw scanner data to BitSight-style finding objects
+// Convert raw scanner data to finding objects
 function issuesToFindings(issues, types) {
   return issues
     .filter(i => !types || types.some(t => (i.type??'').toLowerCase().includes(t.toLowerCase()) || (i.id??'').toLowerCase().includes(t.toLowerCase())))
@@ -563,7 +563,7 @@ a { color:#1d4ed8 }
 </div>
 
 <!-- ══════════════════════════════════════════════════════
-     RISK VECTOR SECTIONS — mirrors BitSight structure
+     RISK VECTOR SECTIONS
 ══════════════════════════════════════════════════════ -->
 <div class="page-break" style="background:#fff">
   <div style="padding:48px 64px 16px;border-bottom:1px solid #e5e7eb">

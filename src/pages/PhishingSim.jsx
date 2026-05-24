@@ -1,7 +1,7 @@
 /**
  * Phishing Simulation — send safe test phishing emails to staff.
  * Tracks who opens and clicks. Shows results and sends education.
- * Replaces Defendify's Phishing Simulation Tool.
+ * Phishing Simulation Tool.
  */
 import React, { useState, useEffect } from 'react'
 import { StatCard, Card, Grid } from '../components/ui'

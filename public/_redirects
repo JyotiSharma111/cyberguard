@@ -1,1 +1,7 @@
-/* /index.html 200
+# Static pages — serve directly
+/privacy        /privacy.html   200
+/terms          /terms.html     200
+/sitemap.xml    /sitemap.xml    200
+
+# SPA fallback — all other routes go to React app
+/*              /index.html     200

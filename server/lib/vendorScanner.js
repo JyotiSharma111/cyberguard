@@ -3,7 +3,7 @@
  * Runs DNS + SSL + email auth only (no Shodan/subdomains — too slow for vendors).
  * Designed to scan 10+ vendors in reasonable time.
  *
- * Grading scale (same as BitSight):
+ * Grading scale:
  *   A  = 850-1000  Excellent
  *   B  = 700-849   Good
  *   C  = 550-699   Needs attention

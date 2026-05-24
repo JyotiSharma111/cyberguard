@@ -1,6 +1,6 @@
 /**
  * Documents — IRP + AUP generator.
- * Replaces Defendify's Incident Response Plan + Technology Acceptable Use Policy modules.
+ * Incident Response Plan + Acceptable Use Policy generator.
  */
 import React, { useState } from 'react'
 import { Card, Grid, StatCard } from '../components/ui'

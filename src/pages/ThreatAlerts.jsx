@@ -1,6 +1,6 @@
 /**
  * Threat Alerts — live threat intelligence from CISA, AlienVault OTX, NCSC.
- * Replaces Defendify's "Cybersecurity Threat Alerts" module.
+ * Cybersecurity Threat Alerts feed.
  */
 import React, { useState, useEffect } from 'react'
 import { StatCard, Card, Grid } from '../components/ui'
