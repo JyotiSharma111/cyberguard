@@ -6,11 +6,16 @@
 import { createContext, useContext, useReducer, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
+function getInitialPage() {
+  try { return sessionStorage.getItem('cg_page') || 'overview' }
+  catch { return 'overview' }
+}
+
 const INITIAL = {
   authLoading: true,
   user:        null,
   profile:     null,
-  activePage:  sessionStorage.getItem('cg_page') || 'overview',
+  activePage:  getInitialPage(),
   scanRunning: false,
   toast:       null,
   _log:        [],
@@ -43,9 +48,11 @@ function reducer(state, action) {
     case A.AUTH_SIGNED_OUT: return { ...INITIAL, _log, authLoading: false }
     case A.SET_PROFILE:     return { ...state, _log, profile: action.payload }
     case A.SET_PAGE:
-        if (action.payload && !action.payload.startsWith('__')) {
-          sessionStorage.setItem('cg_page', action.payload)
-        }
+        try {
+          if (action.payload && !action.payload.startsWith('__')) {
+            sessionStorage.setItem('cg_page', action.payload)
+          }
+        } catch {}
         return { ...state, _log, activePage: action.payload }
     case A.SCAN_START:      return { ...state, _log, scanRunning: true }
     case A.SCAN_DONE:       return { ...state, _log, scanRunning: false }
