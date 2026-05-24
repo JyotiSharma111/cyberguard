@@ -106,6 +106,7 @@ router.get('/track/open/:campaignId/:recipientId', async (req, res) => {
         body: JSON.stringify({ opened_at: new Date().toISOString() })
       }).catch(() => {})
     }
+  }  // ← closes if (SUPABASE_URL && SUPABASE_KEY)
   // Return 1x1 transparent pixel
   const pixel = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64')
   res.set('Content-Type', 'image/gif').send(pixel)

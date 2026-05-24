@@ -10,9 +10,10 @@ router.post('/generate', async (req, res, next) => {
   try {
     const { platform, domainId, orgName } = req.body
     const baseUrl    = process.env.FRONTEND_URL ?? 'http://localhost:5173'
-    const apiUrl     = process.env.RAILWAY_PUBLIC_DOMAIN
-      ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-      : (process.env.BACKEND_URL ?? `http://localhost:${process.env.PORT ?? 3001}`)
+    // Build webhook URL from the request's own host (works on Railway automatically)
+    const proto      = req.headers['x-forwarded-proto'] ?? 'https'
+    const host       = req.headers['x-forwarded-host'] ?? req.headers.host ?? 'localhost:3001'
+    const apiUrl     = process.env.BACKEND_URL ?? `${proto}://${host}`
     const webhookUrl = `${apiUrl}/api/canary/alert`
 
     const script = platform === 'windows'

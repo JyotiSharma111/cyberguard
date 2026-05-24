@@ -1,14 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CyberGuard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary SEO -->
+  <title>CyberGuard — Security Monitoring for Small Business | Free Scan</title>
+  <meta name="description" content="CyberGuard monitors your DNS, SSL, email security, open ports, credentials, and cloud accounts — giving you a security score in under 90 seconds. Free for 1 domain. No install required." />
+  <meta name="keywords" content="cybersecurity small business, SMB security monitoring, DMARC checker, SSL certificate monitoring, security score, email security, SPF DKIM DMARC, HIBP breach check, vendor risk grading, T-Mobile vendor compliance" />
+  <meta name="author" content="CyberGuard" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://cyberguard-4f4.pages.dev/" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cyberguard-4f4.pages.dev/" />
+  <meta property="og:title" content="CyberGuard — Security Monitoring for Small Business" />
+  <meta property="og:description" content="9 security scanners. One score. Plain English. Free for 1 domain — no install needed. Scan your domain in under 90 seconds." />
+  <meta property="og:image" content="https://cyberguard-4f4.pages.dev/og-image.png" />
+  <meta property="og:site_name" content="CyberGuard" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CyberGuard — Free Security Score for Your Business" />
+  <meta name="twitter:description" content="DNS, SSL, email auth, credentials, cloud — 9 checks, one score, under 90 seconds. Free forever for 1 domain." />
+  <meta name="twitter:image" content="https://cyberguard-4f4.pages.dev/og-image.png" />
+
+  <!-- AEO / AI search structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "CyberGuard",
+    "applicationCategory": "SecurityApplication",
+    "operatingSystem": "Web",
+    "description": "CyberGuard is an all-in-one cybersecurity monitoring platform for small and medium businesses. It runs 9 security scanners across DNS, SSL, email authentication, open ports, credentials, and cloud services, generating a security score and grade in under 90 seconds.",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Starter",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Free forever. 1 domain, full 9-scanner scan, email alerts."
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro",
+        "price": "49",
+        "priceCurrency": "USD",
+        "billingIncrement": "month",
+        "description": "3 domains, staff email breach checking, PDF reports, Slack and Teams alerts."
+      },
+      {
+        "@type": "Offer",
+        "name": "Business",
+        "price": "99",
+        "priceCurrency": "USD",
+        "billingIncrement": "month",
+        "description": "10 domains, API access, T-Mobile compliance pack, branded reports."
+      }
+    ],
+    "featureList": [
+      "DNS security monitoring",
+      "SSL/TLS certificate monitoring",
+      "Email authentication (SPF, DKIM, DMARC)",
+      "Open port scanning via Shodan",
+      "Credential breach monitoring (HIBP)",
+      "VirusTotal threat intelligence",
+      "Automated pentest checks",
+      "Cloud integration scanning (M365, AWS, GitHub, Cloudflare, Google Workspace)",
+      "Phishing simulations",
+      "Incident Response Plan generator",
+      "Ransomware canary scripts",
+      "Microsoft Teams and Slack alerts",
+      "Vendor risk grading",
+      "T-Mobile vendor compliance export"
+    ],
+    "url": "https://cyberguard-4f4.pages.dev",
+    "screenshot": "https://cyberguard-4f4.pages.dev/og-image.png"
+  }
+  </script>
+
+  <!-- FAQ structured data for AEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does CyberGuard scan?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "CyberGuard runs 9 checks: DNS records, SSL certificates, email authentication (SPF, DKIM, DMARC), HTTP security headers, open ports via Shodan, subdomain discovery, WHOIS/domain expiry, credential breaches via HaveIBeenPwned, and domain reputation via VirusTotal. All passive — we never touch your servers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does CyberGuard satisfy T-Mobile vendor security requirements?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. CyberGuard covers cloud service monitoring (M365, AWS, GitHub, Cloudflare), 24/7 automated detection with instant alerts, Incident Response Plan generation, and ransomware canary scripts for endpoint detection. Combined with naming yourself as the on-call responder in the IRP, this satisfies T-Mobile's vendor incident management requirement."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is CyberGuard different from Defendify?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "CyberGuard covers 11 of Defendify's 13 modules at $49/month versus Defendify's $925-$2,950/month. The main difference is Defendify has a 24/7 human SOC team; CyberGuard uses automated monitoring with instant alerts. For most SMBs, the automated approach is sufficient and saves over $10,000 per year."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is CyberGuard free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The Starter plan is free forever — 1 domain, all 9 scanners, email alerts, uptime monitoring, and a ransomware canary script. No credit card required."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" />
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
 </html>

@@ -38,6 +38,13 @@ export default function Topbar() {
   const { state, send } = useApp()
   const { domainName, domainRow, reload } = useScanData()
   const [icon, title] = PAGE_META[state.activePage] ?? ['ti-layout-dashboard', 'Dashboard']
+  const [signingOut, setSigningOut] = React.useState(false)
+
+  async function handleSignOut() {
+    setSigningOut(true)
+    await import('../../lib/supabase').then(m => m.supabase.auth.signOut())
+    setSigningOut(false)
+  }
 
   // Auto-clear toast
   useEffect(() => {
@@ -190,6 +197,24 @@ export default function Topbar() {
         <button style={{ width:30, height:30, background:'transparent', border:'0.5px solid rgba(255,255,255,0.08)', borderRadius:7, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', position:'relative' }}
           aria-label="Alerts">
           <i className="ti ti-bell" style={{ fontSize:14, color:'#6b7789' }} aria-hidden="true" />
+        </button>
+
+        {/* Account */}
+        <button onClick={() => send(A.SET_PAGE, 'account')}
+          title="Account settings"
+          style={{ width:30, height:30, background:'transparent', border:'0.5px solid rgba(255,255,255,0.08)', borderRadius:7, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+          <i className="ti ti-user-circle" style={{ fontSize:14, color:'#6b7789' }} aria-hidden="true"/>
+        </button>
+
+        {/* Sign out */}
+        <button onClick={async () => {
+          const { supabase } = await import('../../lib/supabase')
+          await supabase.auth.signOut()
+        }}
+          title="Sign out"
+          style={{ width:30, height:30, background:'transparent', border:'0.5px solid rgba(255,71,87,0.15)', borderRadius:7, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}
+          aria-label="Sign out">
+          <i className="ti ti-logout" style={{ fontSize:14, color:'#ff4757' }} aria-hidden="true"/>
         </button>
       </div>
     </header>
