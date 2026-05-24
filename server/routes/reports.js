@@ -1,4 +1,5 @@
-import { Router } from 'express';
+import { Router } from 'express'
+import { requirePlan, attachUser } from '../middleware/planCheck.js';
 import { asyncHandler, ApiError } from '../middleware/errors.js';
 
 export const reportsRouter = Router();

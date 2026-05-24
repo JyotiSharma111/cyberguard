@@ -16,6 +16,17 @@ const IS_DEV = import.meta.env.DEV
 /**
  * Core fetch wrapper. Returns { ok, data, error, status }.
  */
+async function getAuthHeader() {
+  try {
+    // Import supabase lazily to avoid circular deps
+    const { supabase } = await import('./supabase.js')
+    const { data: { session } } = await supabase.auth.getSession()
+    return session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}
+  } catch {
+    return {}
+  }
+}
+
 async function apiFetch(path, options = {}) {
   const url = `${BASE}${path}`
   const controller = new AbortController()
@@ -23,11 +34,14 @@ async function apiFetch(path, options = {}) {
 
   if (IS_DEV) console.debug(`[API] → ${options.method ?? 'GET'} ${url}`)
 
+  // Attach auth token so server can enforce plan limits
+  const authHeader = await getAuthHeader()
+
   try {
     const res = await fetch(url, {
       ...options,
       signal: controller.signal,
-      headers: { 'Content-Type': 'application/json', ...(options.headers ?? {}) },
+      headers: { 'Content-Type': 'application/json', ...authHeader, ...(options.headers ?? {}) },
     })
     clearTimeout(timer)
 

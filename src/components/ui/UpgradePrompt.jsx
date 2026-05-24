@@ -1,83 +1,95 @@
 /**
- * UpgradePrompt — shown inline when a user hits a plan limit.
- * Compact version for inside cards, full version for modals.
+ * UpgradePrompt — shown when a user hits a plan limit.
+ * Used as an inline banner or modal overlay.
  */
-import React, { useState } from 'react'
-import { useApp } from '../../store/appStore'
-import { PLANS, nextPlan } from '../../lib/planLimits'
-import { createCheckout } from '../../lib/api'
+import React from 'react'
+import { useApp, A } from '../../store/appStore'
 
-export default function UpgradePrompt({ feature, compact = false }) {
-  const { state } = useApp()
-  const [loading, setLoading] = useState(false)
+export default function UpgradePrompt({ 
+  feature, 
+  message, 
+  upgrade = 'pro', 
+  inline = false,
+  onDismiss 
+}) {
+  const { send } = useApp()
 
-  const currentPlan = state.profile?.plan ?? 'free'
-  const targetPlan  = nextPlan(currentPlan)
-  if (!targetPlan) return null  // already on business
-
-  const plan   = PLANS[targetPlan]
-  const userId = state.user?.id
-  const email  = state.user?.email
-
-  async function handleUpgrade() {
-    if (!userId || !email) return
-    setLoading(true)
-    const result = await createCheckout(userId, email, targetPlan)
-    setLoading(false)
-    if (result.ok && result.data?.url) {
-      window.location.href = result.data.url
-    } else {
-      alert(result.error ?? 'Could not open checkout — make sure STRIPE_SECRET_KEY is set in .env.local')
-    }
+  const plans = {
+    pro:      { name:'Pro', price:'$49/mo', color:'#4fa6ff' },
+    business: { name:'Business', price:'$99/mo', color:'#00df78' },
   }
+  const plan = plans[upgrade] ?? plans.pro
 
-  if (compact) {
-    return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px', background:'rgba(79,166,255,0.05)', border:'0.5px solid rgba(79,166,255,0.15)', borderRadius:8, margin:'8px 14px' }}>
-        <div>
-          <span style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:10, color:'#4fa6ff' }}>
-            {feature} — available on {plan.name} (${plan.price}/mo)
-          </span>
+  const content = (
+    <div style={{
+      background: inline ? 'rgba(79,166,255,0.06)' : '#0f1420',
+      border: `0.5px solid rgba(79,166,255,0.25)`,
+      borderRadius: 10,
+      padding: inline ? '12px 16px' : '24px',
+      display: 'flex',
+      alignItems: inline ? 'center' : 'flex-start',
+      gap: 12,
+      flexDirection: inline ? 'row' : 'column',
+    }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ 
+          fontSize: inline ? 12 : 15, 
+          fontWeight: 600, 
+          color: '#dde2ed',
+          marginBottom: 4,
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 6 
+        }}>
+          <i className="ti ti-lock" style={{ fontSize: 13, color: plan.color }} aria-hidden="true"/>
+          {feature || 'Upgrade required'}
         </div>
-        <button onClick={handleUpgrade} disabled={loading}
-          style={{ background:'rgba(79,166,255,0.1)', border:'0.5px solid rgba(79,166,255,0.25)', borderRadius:6, padding:'5px 12px', fontSize:11, fontWeight:600, color:'#4fa6ff', cursor:'pointer', fontFamily:'Syne,sans-serif', flexShrink:0 }}>
-          {loading ? 'Loading…' : `Upgrade to ${plan.name} →`}
+        <div style={{ 
+          fontSize: inline ? 11 : 13, 
+          color: '#6b7789', 
+          lineHeight: 1.6 
+        }}>
+          {message || `This feature requires ${plan.name}`}
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+        <button
+          onClick={() => send(A.SET_PAGE, 'billing')}
+          style={{
+            padding: inline ? '6px 14px' : '9px 20px',
+            background: `${plan.color}14`,
+            border: `0.5px solid ${plan.color}44`,
+            borderRadius: 7,
+            fontSize: inline ? 11 : 13,
+            fontWeight: 600,
+            color: plan.color,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}>
+          Upgrade to {plan.name} →
         </button>
+        {onDismiss && (
+          <button onClick={onDismiss}
+            style={{ background: 'none', border: 'none', color: '#3a4455', cursor: 'pointer', fontSize: 16, padding: '0 4px' }}
+            aria-label="Dismiss">×</button>
+        )}
       </div>
-    )
-  }
+    </div>
+  )
 
+  if (inline) return content
+
+  // Modal overlay
   return (
-    <div style={{ background:'#0f1420', border:'0.5px solid rgba(79,166,255,0.2)', borderRadius:12, padding:'24px 24px', maxWidth:420, margin:'20px auto' }}>
-      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
-        <div style={{ width:32, height:32, borderRadius:8, background:'rgba(79,166,255,0.08)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-          <i className="ti ti-crown" style={{ fontSize:16, color:'#4fa6ff' }} aria-hidden="true"/>
-        </div>
-        <div>
-          <div style={{ fontSize:13, fontWeight:600, color:'#dde2ed' }}>{plan.name} plan</div>
-          <div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:10, color:'#3a4455' }}>${plan.price}/month · 14-day free trial</div>
-        </div>
-      </div>
-
-      <div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:10, color:'#6b7789', marginBottom:12 }}>
-        {feature} requires the {plan.name} plan.
-      </div>
-
-      <div style={{ display:'flex', flexDirection:'column', gap:5, marginBottom:16 }}>
-        {plan.features.slice(0,6).map(f => (
-          <div key={f} style={{ display:'flex', gap:8, fontSize:11, color:'#6b7789' }}>
-            <span style={{ color:'#00df78', flexShrink:0 }}>✓</span>{f}
-          </div>
-        ))}
-      </div>
-
-      <button onClick={handleUpgrade} disabled={loading}
-        style={{ width:'100%', background:'rgba(79,166,255,0.1)', border:'0.5px solid rgba(79,166,255,0.3)', borderRadius:8, padding:'11px', fontSize:13, fontWeight:600, color:'#4fa6ff', cursor:'pointer', fontFamily:'Syne,sans-serif' }}>
-        {loading ? 'Opening checkout…' : `Start free trial — ${plan.name} $${plan.price}/mo →`}
-      </button>
-
-      <div style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:9, color:'#3a4455', textAlign:'center', marginTop:8 }}>
-        14-day free trial · Cancel anytime · No credit card until trial ends
+    <div style={{ 
+      position: 'fixed', inset: 0, 
+      background: 'rgba(0,0,0,0.6)', 
+      zIndex: 9999,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 20,
+    }} onClick={onDismiss}>
+      <div onClick={e => e.stopPropagation()} style={{ maxWidth: 400, width: '100%' }}>
+        {content}
       </div>
     </div>
   )

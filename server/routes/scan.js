@@ -3,6 +3,7 @@
  * GET /api/scan/:domain
  */
 import { Router } from 'express'
+import { requirePlan, attachUser } from '../middleware/planCheck.js'
 import { scanDomain }       from '../lib/dnsScanner.js'
 import { scanSSL }          from '../lib/sslScanner.js'
 import { scanCredentials }  from '../lib/credScanner.js'

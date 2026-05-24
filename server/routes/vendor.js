@@ -3,6 +3,7 @@
  * GET /api/vendor/:domain
  */
 import { Router } from 'express'
+import { requirePlan, attachUser } from '../middleware/planCheck.js'
 import { scanVendor } from '../lib/vendorScanner.js'
 
 const router = Router()

@@ -189,3 +189,5 @@ export function Toast({ msg = '', type = 'bl', onClose }) {
 }
 
 export { default as FixWizard } from './FixWizard'
+
+export { default as UpgradePrompt } from './UpgradePrompt'
