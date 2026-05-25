@@ -5,14 +5,14 @@
  * No external service needed — just HTTP HEAD requests.
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { getSupabase } from './supabaseServer.js'
 import { Resend } from 'resend'
 
 const TIMEOUT_MS = 10000
 
 function getClients() {
   return {
-    supabase: createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY),
+    supabase: getSupabase(),
     resend:   process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null,
   }
 }

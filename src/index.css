@@ -28,6 +28,7 @@
   --fm:     'IBM Plex Mono', monospace;
   --radius: 8px;
   --radius-lg: 10px;
+  --sidebar-w: 192px;
 }
 
 html, body, #root {
@@ -49,7 +50,7 @@ button { cursor: pointer; font-family: var(--fh); }
 input, textarea, select { font-family: var(--fm); color: var(--t); }
 a { color: inherit; text-decoration: none; }
 
-/* pulse animation */
+/* animations */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.3; }
@@ -61,7 +62,159 @@ a { color: inherit; text-decoration: none; }
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
 
 .animate-fade-in { animation: fade-in 0.2s ease both; }
 .animate-spin    { animation: spin 1s linear infinite; }
 .pulse-dot       { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* ─── RESPONSIVE LAYOUT ─────────────────────────────────── */
+
+/* App shell */
+.app-shell {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Sidebar overlay on mobile */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 199;
+  backdrop-filter: blur(2px);
+}
+
+/* Mobile nav bottom bar */
+.mobile-nav {
+  display: none;
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Page scroll area */
+.page-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ─── GRID RESPONSIVE ────────────────────────────────────── */
+
+/* StatCard grids — 4 cols → 2 → 2 */
+.stat-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+/* General 2-col grid */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* General 3-col grid */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+/* Topbar title truncation */
+.topbar-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+/* Table horizontal scroll */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── BREAKPOINTS ────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  :root { --sidebar-w: 240px; }
+
+  /* Hide sidebar by default on mobile */
+  .sidebar-desktop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    width: var(--sidebar-w) !important;
+  }
+
+  .sidebar-desktop.open {
+    transform: translateX(0);
+    animation: slide-in-left 0.25s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+
+  .sidebar-overlay.show {
+    display: block;
+  }
+
+  /* Stack stat cards 2-up on mobile */
+  .stat-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  /* Stack 2-col grids */
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Stack 3-col grids */
+  .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Reduce padding on pages */
+  .page-padding {
+    padding: 10px !important;
+  }
+
+  /* Topbar on mobile */
+  .topbar-actions .hide-mobile {
+    display: none;
+  }
+
+  .topbar-title {
+    max-width: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Single col stat cards on very small screens */
+  .stat-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .topbar-title {
+    max-width: 100px;
+  }
+}

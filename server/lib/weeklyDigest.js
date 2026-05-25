@@ -5,11 +5,11 @@
  */
 
 import { Resend } from 'resend'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabase } from './supabaseServer.js'
 
 function getClients() {
   const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
-  const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+  const supabase = getSupabase()
   return { resend, supabase }
 }
 

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { checkUptime, runUptimeChecks } from '../lib/uptimeChecker.js'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabase } from '../lib/supabaseServer.js'
 
 const router = Router()
 
@@ -11,7 +11,7 @@ router.get('/check/:domain', async (req, res, next) => {
     const result = await checkUptime(domain)
 
     // Save to DB if we can find the domain_id
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+    const supabase = getSupabase()
 
     // Look up domain_id from domain name
     const { data: domainRow } = await supabase
@@ -38,7 +38,7 @@ router.get('/check/:domain', async (req, res, next) => {
 // Get uptime history for a domain
 router.get('/history/:domainId', async (req, res, next) => {
   try {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+    const supabase = getSupabase()
     const { data } = await supabase
       .from('uptime_checks')
       .select('up, status, latency_ms, error, checked_at')

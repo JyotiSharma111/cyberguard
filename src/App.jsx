@@ -108,12 +108,14 @@ function AppShell() {
 
   const Page = PAGES[state.activePage] ?? Overview
 
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   return (
-    <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#080b10' }}>
-      <Sidebar />
-      <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
-        <Topbar />
-        <main style={{ flex:1, overflowY:'auto' }}>
+    <div className="app-shell" style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#080b10' }}>
+      <Sidebar mobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minWidth:0 }}>
+        <Topbar onMenuOpen={() => setSidebarOpen(true)} />
+        <main style={{ flex:1, overflowY:'auto', overflowX:'hidden' }} className="page-scroll">
           <Page key={state.activePage} />
         </main>
       </div>

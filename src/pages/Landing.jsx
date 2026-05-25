@@ -140,10 +140,10 @@ export default function Landing() {
           <span style={{ fontFamily:'Syne,sans-serif', fontSize:18, fontWeight:700 }}>CyberGuard</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-          <a href="#features" style={{ fontSize:13, color:'#6b7789', textDecoration:'none' }}>Features</a>
-          <a href="#pricing"  style={{ fontSize:13, color:'#6b7789', textDecoration:'none' }}>Pricing</a>
-          <a href="#faq"      style={{ fontSize:13, color:'#6b7789', textDecoration:'none' }}>FAQ</a>
-          <button onClick={goLogin}
+          <a href="#features" className="nav-link-hide" style={{ fontSize:13, color:'#6b7789', textDecoration:'none' }}>Features</a>
+          <a href="#pricing"  className="nav-link-hide" style={{ fontSize:13, color:'#6b7789', textDecoration:'none' }}>Pricing</a>
+          <a href="#faq"      className="nav-link-hide" style={{ fontSize:13, color:'#6b7789', textDecoration:'none' }}>FAQ</a>
+          <button onClick={goLogin} className="nav-link-hide"
             style={{ background:'transparent', border:'0.5px solid rgba(255,255,255,0.1)', borderRadius:8, padding:'7px 16px', fontSize:12, color:'#6b7789', cursor:'pointer' }}>
             Sign in
           </button>
@@ -161,7 +161,7 @@ export default function Landing() {
           60% of SMBs that suffer a breach close within 6 months
         </div>
 
-        <h1 style={{ fontFamily:'Syne,sans-serif', fontSize:54, fontWeight:800, lineHeight:1.12, marginBottom:20, color:'#dde2ed', letterSpacing:'-1px' }}>
+        <h1 className="hero-headline" style={{ fontFamily:'Syne,sans-serif', fontSize:54, fontWeight:800, lineHeight:1.12, marginBottom:20, color:'#dde2ed', letterSpacing:'-1px' }}>
           Know your security score<br/>
           <span style={{ color:'#4fa6ff' }}>before attackers do.</span>
         </h1>
@@ -228,7 +228,7 @@ export default function Landing() {
           </p>
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(260px,1fr))', gap:12 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(240px,1fr))', gap:12 }}>
           {FEATURES.map((f, i) => (
             <div key={i}
               style={{ background:'rgba(255,255,255,0.02)', border:'0.5px solid rgba(255,255,255,0.06)', borderRadius:10, padding:'18px 18px', transition:'all .15s' }}
@@ -319,7 +319,7 @@ export default function Landing() {
           <p style={{ fontSize:14, color:'#6b7789' }}>No contracts. Cancel anytime. All plans include a 14-day free trial of paid features.</p>
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+        <div className="grid-3" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
           {[
             { key:'free',    highlight:false, badge:null },
             { key:'pro',     highlight:true,  badge:'Most popular' },
@@ -427,6 +427,14 @@ export default function Landing() {
       <style>{`
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         @keyframes spin  { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @media (max-width: 768px) {
+          .nav-link-hide { display: none !important; }
+          .hero-headline { font-size: 36px !important; }
+          .grid-3 { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          .hero-headline { font-size: 28px !important; }
+        }
       `}</style>
     </div>
   )

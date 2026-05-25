@@ -149,8 +149,9 @@ export function IssueRow({ sev = 'low', name = '', tag = '', tagType = 'bl', fix
 
 // ─── SectionGrid ──────────────────────────────────────────────────────────────
 export function Grid({ cols = 4, gap = 10, children }) {
+  const cls = cols === 4 ? 'stat-grid-4' : cols === 2 ? 'grid-2' : cols === 3 ? 'grid-3' : ''
   return (
-    <div style={{ display:'grid', gridTemplateColumns:`repeat(${cols}, minmax(0,1fr))`, gap }}>
+    <div className={cls} style={{ display:'grid', gridTemplateColumns:`repeat(${cols}, minmax(0,1fr))`, gap }}>
       {children}
     </div>
   )

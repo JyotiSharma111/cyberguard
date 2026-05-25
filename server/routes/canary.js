@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { generatePowerShellCanary, generateBashCanary } from '../lib/canaryGenerator.js'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabase } from '../lib/supabaseServer.js'
 import { Resend } from 'resend'
 
 const router = Router()
@@ -31,7 +31,7 @@ router.post('/alert', async (req, res, next) => {
     const { canaryId, orgName, event, filePath, hostname, username, platform, timestamp } = req.body
     console.log(`[canary] 🚨 ALERT from ${orgName} — ${event} on ${hostname} by ${username}`)
 
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+    const supabase = getSupabase()
 
     // Save to canary_alerts table
     await supabase.from('canary_alerts').insert({
@@ -102,7 +102,7 @@ router.post('/alert', async (req, res, next) => {
 // Get canary status for a domain
 router.get('/status/:domainId', async (req, res, next) => {
   try {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+    const supabase = getSupabase()
     const { data: deployments } = await supabase
       .from('canary_deployments')
       .select('*')
@@ -124,7 +124,7 @@ router.get('/status/:domainId', async (req, res, next) => {
 router.post('/deploy', async (req, res, next) => {
   try {
     const { canaryId, domainId, userId, platform, hostname } = req.body
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+    const supabase = getSupabase()
     await supabase.from('canary_deployments').insert({
       canary_id: canaryId, domain_id: domainId,
       user_id: userId, platform, hostname,
