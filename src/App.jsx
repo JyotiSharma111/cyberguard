@@ -112,6 +112,14 @@ function AppShell() {
 
   return (
     <div className="app-shell" style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#080b10' }}>
+      {/* Sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:199, backdropFilter:'blur(2px)' }}
+          aria-hidden="true"
+        />
+      )}
       <Sidebar mobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minWidth:0 }}>
         <Topbar onMenuOpen={() => setSidebarOpen(true)} />
@@ -119,6 +127,8 @@ function AppShell() {
           <Page key={state.activePage} />
         </main>
       </div>
+      {/* Mobile bottom nav */}
+      <MobileBottomNav activeId={state.activePage} onNavigate={(id) => { send(A.SET_PAGE, id); setSidebarOpen(false) }} onMenuOpen={() => setSidebarOpen(true)} />
       {state.toast && <Toast msg={state.toast.msg} type={state.toast.type} onClose={() => send(A.TOAST_CLEAR)} />}
     </div>
   )

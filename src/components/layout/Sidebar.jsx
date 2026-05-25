@@ -35,14 +35,7 @@ const NAV = [
   { id: 'guides',       label: 'Setup Guides',          icon: 'ti-book' },
 ]
 
-// Mobile bottom nav — most-used 5 items
-const MOBILE_NAV = [
-  { id: 'overview',     icon: 'ti-layout-dashboard', label: 'Home' },
-  { id: 'score',        icon: 'ti-chart-bar',        label: 'Score' },
-  { id: 'domain',       icon: 'ti-world',            label: 'Domain' },
-  { id: 'threats',      icon: 'ti-radar',            label: 'Threats' },
-  { id: '__menu',       icon: 'ti-menu-2',           label: 'More' },
-]
+
 
 export default function Sidebar({ mobileOpen, onClose }) {
   const { state, send }  = useApp()
@@ -178,54 +171,13 @@ export default function Sidebar({ mobileOpen, onClose }) {
         </div>
       </aside>
 
-      {/* Mobile bottom nav */}
-      <MobileNav activeId={state.activePage} onNavigate={navigate} onMenuOpen={() => navigate('__menu')} />
 
-      <style>{`
-        @media (max-width: 768px) {
-          .mobile-close-btn { display: block !important; }
-        }
-      `}</style>
+
     </>
   )
 }
 
-function MobileNav({ activeId, onNavigate, onMenuOpen }) {
-  return (
-    <nav style={{
-      display: 'none',
-      position: 'fixed', bottom: 0, left: 0, right: 0,
-      background: '#0f1420',
-      borderTop: '0.5px solid rgba(255,255,255,0.08)',
-      zIndex: 100,
-      paddingBottom: 'env(safe-area-inset-bottom)',
-    }} className="mobile-bottom-nav" aria-label="Mobile navigation">
-      <style>{`
-        @media (max-width: 768px) {
-          .mobile-bottom-nav { display: flex !important; }
-          .app-shell { padding-bottom: 56px; }
-        }
-      `}</style>
-      {MOBILE_NAV.map(item => {
-        const isMenu   = item.id === '__menu'
-        const isActive = !isMenu && activeId === item.id
-        return (
-          <button key={item.id}
-            onClick={() => isMenu ? onMenuOpen() : onNavigate(item.id)}
-            style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-              justifyContent: 'center', gap: 3, padding: '8px 4px',
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: isActive ? '#4fa6ff' : '#3a4455',
-            }}>
-            <i className={`ti ${item.icon}`} style={{ fontSize: 20 }} aria-hidden="true"/>
-            <span style={{ fontFamily: 'IBM Plex Mono,monospace', fontSize: 9 }}>{item.label}</span>
-          </button>
-        )
-      })}
-    </nav>
-  )
-}
+// MobileBottomNav is rendered in App.jsx
 
 function DomainSwitcher({ onNavigate }) {
   const { domains, activeDomain, switchDomain } = useActiveDomain()
