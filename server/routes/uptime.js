@@ -58,16 +58,19 @@ router.get('/history/:domainId', async (req, res, next) => {
   } catch (err) { next(err) }
 })
 
-// Cron — run all uptime checks
-router.post('/run', async (req, res, next) => {
+// Cron — run all uptime checks (accepts both GET and POST)
+async function handleRun(req, res, next) {
   try {
     const secret = req.query.secret ?? req.body?.secret
     if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
-      return res.status(401).json({ ok: false, error: 'Unauthorized' })
+      return res.status(401).json({ ok: false, error: 'Unauthorized — add ?secret=YOUR_CRON_SECRET' })
     }
     const result = await runUptimeChecks()
     res.json({ ok: true, ...result })
   } catch (err) { next(err) }
-})
+}
+
+router.get('/run',  handleRun)
+router.post('/run', handleRun)
 
 export default router
