@@ -9,17 +9,6 @@ import { scoreColor } from '../utils/helpers'
 export default function Score() {
   const { state } = useApp()
   const plan = state.profile?.plan ?? 'free'
-  if (plan === 'free') {
-    return (
-      <div style={{ padding:16 }}>
-        <UpgradePrompt
-          feature="Score history"
-          message="Track your security score over time and see what changed. Upgrade to Pro to unlock 90-day score history."
-          upgrade="pro"
-        />
-      </div>
-    )
-  }
   const {
     domainName, domainRow, isReal, scores, issueCount, scoreDimensions,
     dnsIssues, emailIssues, sslIssues, scannedAt,
@@ -57,7 +46,18 @@ export default function Score() {
 
       {domainRow && (
         <Card title="Score history — last 90 days" titleIcon="ti-chart-line">
-          <ScoreChart domainId={domainRow.id} height={160} />
+          {plan === 'free' ? (
+            <div style={{ padding:'14px' }}>
+              <UpgradePrompt
+                feature="Score history"
+                message="See how your security score changes week by week. Track the impact of every fix you make."
+                upgrade="pro"
+                inline={true}
+              />
+            </div>
+          ) : (
+            <ScoreChart domainId={domainRow.id} height={160} />
+          )}
         </Card>
       )}
 
