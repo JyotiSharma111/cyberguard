@@ -51,6 +51,7 @@ const PAGES = {
 function AppShell() {
   const { state, send }  = useApp()
   const [hasDomain, setHasDomain] = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     if (!state.user) { setHasDomain(null); return }
@@ -107,8 +108,6 @@ function AppShell() {
   }} />
 
   const Page = PAGES[state.activePage] ?? Overview
-
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="app-shell" style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#080b10' }}>
