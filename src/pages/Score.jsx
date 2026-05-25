@@ -7,7 +7,8 @@ import ReportButton from '../components/ui/ReportButton'
 import { scoreColor } from '../utils/helpers'
 
 export default function Score() {
-  const plan = state.user?.plan ?? state.profile?.plan ?? 'free'
+  const { state } = useApp()
+  const plan = state.profile?.plan ?? 'free'
   if (plan === 'free') {
     return (
       <div style={{ padding:16 }}>
@@ -19,7 +20,6 @@ export default function Score() {
       </div>
     )
   }
-  const { state } = useApp()
   const {
     domainName, domainRow, isReal, scores, issueCount, scoreDimensions,
     dnsIssues, emailIssues, sslIssues, scannedAt,
