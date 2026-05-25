@@ -79,16 +79,18 @@ router.post('/digest', async (req, res, next) => {
  */
 router.post('/test', async (req, res, next) => {
   try {
-    const { email, domain } = req.body
+    const { email, domain, slackWebhook, teamsWebhook } = req.body
     if (!email) return res.status(400).json({ ok: false, error: 'email required' })
 
     const result = await sendAlert({
       domain: domain ?? 'your-domain.com',
       alert: {
-        type:     'test',
-        severity: 'info',
-        subject:  '✅ CyberGuard alerts are working',
-        detail:   'This is a test alert confirming your CyberGuard alert settings are configured correctly. You will receive alerts like this when security issues are detected.',
+        type:          'test',
+        severity:      'info',
+        subject:       '✅ CyberGuard alerts are working',
+        detail:        'This is a test alert from CyberGuard. Your alert settings are configured correctly.',
+        slackWebhook:  slackWebhook ?? null,
+        teamsWebhook:  teamsWebhook ?? null,
       },
       recipients: [email],
       scanData: null,

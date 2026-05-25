@@ -4,11 +4,34 @@ import { createClient } from '@supabase/supabase-js'
 
 const router = Router()
 
-// Single domain check
+// Single domain check — runs check AND saves to DB
 router.get('/check/:domain', async (req, res, next) => {
   try {
-    const result = await checkUptime(req.params.domain)
-    res.json({ ok: true, data: result })
+    const domain = req.params.domain
+    const result = await checkUptime(domain)
+
+    // Save to DB if we can find the domain_id
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+
+    // Look up domain_id from domain name
+    const { data: domainRow } = await supabase
+      .from('domains')
+      .select('id')
+      .eq('name', domain)
+      .maybeSingle()
+
+    if (domainRow?.id) {
+      await supabase.from('uptime_checks').insert({
+        domain_id:  domainRow.id,
+        up:         result.up,
+        status:     result.status,
+        latency_ms: result.latencyMs,
+        error:      result.error ?? null,
+        checked_at: result.checkedAt,
+      })
+    }
+
+    res.json({ ok: true, data: result, saved: !!domainRow?.id })
   } catch (err) { next(err) }
 })
 

@@ -128,7 +128,7 @@ export default function Settings() {
       const res = await fetch(`${import.meta.env.VITE_API_URL??''}/api/alerts/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: ownerEmail, domain: domainRow?.name })
+        body: JSON.stringify({ email: ownerEmail, domain: domainRow?.name, slackWebhook: settings.slack_webhook_url || null, teamsWebhook: settings.teams_webhook_url || null })
       })
       const json = await res.json()
       if (json.sent) {

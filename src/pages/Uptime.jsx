@@ -29,10 +29,25 @@ export default function Uptime() {
   async function checkNow() {
     if (!domainName || checking) return
     setChecking(true)
-    const r = await fetch(`${import.meta.env.VITE_API_URL??''}/api/uptime/check/${domainName}`)
-    const j = await r.json()
+    try {
+      const r = await fetch(`${import.meta.env.VITE_API_URL??''}/api/uptime/check/${domainName}`)
+      const j = await r.json()
+      if (j.ok && j.data) {
+        // Update current status immediately without waiting for DB
+        setData(prev => ({
+          ...(prev ?? {}),
+          current: { ...j.data, latency_ms: j.data.latencyMs },
+          checks:  [{ up: j.data.up, status: j.data.status, latency_ms: j.data.latencyMs, error: j.data.error, checked_at: j.data.checkedAt }, ...(prev?.checks ?? [])],
+          total:   (prev?.total ?? 0) + 1,
+          up:      (prev?.up ?? 0) + (j.data.up ? 1 : 0),
+        }))
+      }
+    } catch (err) {
+      console.error('[Uptime] checkNow failed:', err.message)
+    }
     setChecking(false)
-    await loadHistory()
+    // Reload from DB to get accurate history
+    setTimeout(() => loadHistory(), 1500)
   }
 
   const current    = data?.current
