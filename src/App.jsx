@@ -167,6 +167,46 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+function MobileBottomNav({ activeId, onNavigate, onMenuOpen }) {
+  const items = [
+    { id:'overview',  icon:'ti-layout-dashboard', label:'Home'    },
+    { id:'score',     icon:'ti-chart-bar',         label:'Score'   },
+    { id:'domain',    icon:'ti-world',             label:'Domain'  },
+    { id:'threats',   icon:'ti-radar',             label:'Threats' },
+    { id:'__menu',    icon:'ti-menu-2',            label:'More'    },
+  ]
+  return (
+    <nav aria-label="Mobile navigation" style={{
+      position:'fixed', bottom:0, left:0, right:0,
+      background:'#0f1420',
+      borderTop:'0.5px solid rgba(255,255,255,0.08)',
+      zIndex:150,
+      display:'none',
+      paddingBottom:'env(safe-area-inset-bottom,0px)',
+    }} className="mobile-bottom-nav">
+      {items.map(item => {
+        const isMenu   = item.id === '__menu'
+        const isActive = !isMenu && activeId === item.id
+        return (
+          <button key={item.id}
+            onClick={() => isMenu ? onMenuOpen() : onNavigate(item.id)}
+            style={{
+              flex:1, display:'flex', flexDirection:'column',
+              alignItems:'center', justifyContent:'center',
+              gap:3, padding:'8px 4px',
+              background:'none', border:'none', cursor:'pointer',
+              color: isActive ? '#4fa6ff' : '#3a4455',
+            }}>
+            <i className={`ti ${item.icon}`} style={{ fontSize:20 }} aria-hidden="true"/>
+            <span style={{ fontFamily:'IBM Plex Mono,monospace', fontSize:9 }}>{item.label}</span>
+          </button>
+        )
+      })}
+    </nav>
+  )
+}
+
+
 export default function App() {
   return (
     <ErrorBoundary>
