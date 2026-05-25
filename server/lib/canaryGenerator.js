@@ -12,109 +12,84 @@
 
 export function generatePowerShellCanary({ webhookUrl, orgName, domainId }) {
   const canaryId = `cg-canary-${Date.now()}`
-  return `# CyberGuard Ransomware Canary — ${orgName}
-# Run this once as Administrator. It stays running in the background.
-# If ransomware touches the canary files, CyberGuard alerts you immediately.
-# Generated: ${new Date().toISOString()}
-
-$WebhookUrl = "${webhookUrl}"
-$CanaryId   = "${canaryId}"
-$OrgName    = "${orgName}"
-
-# Create canary files in common target folders
-$CanaryFolders = @(
-  [Environment]::GetFolderPath("Desktop"),
-  [Environment]::GetFolderPath("MyDocuments"),
-  [Environment]::GetFolderPath("MyPictures"),
-  "$env:USERPROFILE\\Downloads"
-)
-
-$CanaryName = "!IMPORTANT-DO-NOT-DELETE-cyberguard-canary.txt"
-$CanaryContent = "CyberGuard security canary file. Do not delete. ID: $CanaryId"
-
-foreach ($folder in $CanaryFolders) {
-  if (Test-Path $folder) {
-    $path = Join-Path $folder $CanaryName
-    Set-Content -Path $path -Value $CanaryContent -Force
-    Write-Host "[CyberGuard] Canary placed: $path"
-  }
-}
-
-Write-Host "[CyberGuard] Canary files deployed. Watching for threats..."
-
-# Set up file system watchers on each folder
-$Watchers = @()
-foreach ($folder in $CanaryFolders) {
-  if (Test-Path $folder) {
-    $watcher = New-Object System.IO.FileSystemWatcher
-    $watcher.Path   = $folder
-    $watcher.Filter = $CanaryName
-    $watcher.NotifyFilter = [System.IO.NotifyFilters]::LastWrite -bor [System.IO.NotifyFilters]::FileName
-    $watcher.EnableRaisingEvents = $true
-    $Watchers += $watcher
-  }
-}
-
-# Alert function
-function Send-Alert {
-  param($EventType, $FilePath)
-  Write-Host "[CyberGuard] ALERT: Canary $EventType detected at $FilePath"
-  $body = @{
-    canaryId  = $CanaryId
-    orgName   = $OrgName
-    event     = $EventType
-    filePath  = $FilePath
-    hostname  = $env:COMPUTERNAME
-    username  = $env:USERNAME
-    timestamp = (Get-Date -Format "o")
-  } | ConvertTo-Json
-  
-  try {
-    Invoke-RestMethod -Uri $WebhookUrl -Method Post \`
-      -ContentType "application/json" -Body $body -TimeoutSec 10
-  } catch {
-    Write-Host "[CyberGuard] Warning: Could not reach webhook: $_"
-  }
-}
-
-# Register event handlers
-foreach ($watcher in $Watchers) {
-  Register-ObjectEvent $watcher "Changed" -Action { 
-    Send-Alert "modified" $Event.SourceEventArgs.FullPath 
-  } | Out-Null
-  Register-ObjectEvent $watcher "Deleted" -Action { 
-    Send-Alert "deleted" $Event.SourceEventArgs.FullPath 
-  } | Out-Null
-  Register-ObjectEvent $watcher "Renamed" -Action { 
-    Send-Alert "renamed" $Event.SourceEventArgs.FullPath 
-  } | Out-Null
-}
-
-# Self-install as a scheduled task so it survives terminal close and reboots
-$TaskName = "CyberGuard-Canary"
-$ScriptDir = "$env:APPDATA\CyberGuard"
-$ScriptPath = "$ScriptDir\canary.ps1"
-
-New-Item -ItemType Directory -Force -Path $ScriptDir | Out-Null
-Copy-Item -Path $PSCommandPath -Destination $ScriptPath -Force
-
-$Action   = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$ScriptPath`""
-$Trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
-$Settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0
-
-try {
-  Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
-  Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -RunLevel Highest -Force | Out-Null
-  Write-Host "[CyberGuard] Installed as background task '$TaskName' — close this window safely"
-  Write-Host "[CyberGuard] Auto-starts at every login"
-  Write-Host "[CyberGuard] To uninstall: Unregister-ScheduledTask -TaskName '$TaskName' -Confirm:`$false"
-} catch {
-  Write-Host "[CyberGuard] Note: run as Administrator for persistent install. Running in foreground for now."
-}
-
-Write-Host "[CyberGuard] Canary monitoring active."
-while ($true) { Start-Sleep -Seconds 30 }
-`
+  const lines = [
+    `# CyberGuard Ransomware Canary — ${orgName}`,
+    `# Run once as Administrator. Installs as a background Scheduled Task.`,
+    `# Generated: ${new Date().toISOString()}`,
+    ``,
+    `$WebhookUrl = "${webhookUrl}"`,
+    `$CanaryId   = "${canaryId}"`,
+    `$OrgName    = "${orgName}"`,
+    `$TaskName   = "CyberGuard-Canary"`,
+    ``,
+    `# Create canary files`,
+    `$CanaryFolders = @(`,
+    `  [Environment]::GetFolderPath("Desktop"),`,
+    `  [Environment]::GetFolderPath("MyDocuments"),`,
+    `  [Environment]::GetFolderPath("MyPictures"),`,
+    `  "$env:USERPROFILE\\Downloads"`,
+    `)`,
+    `$CanaryName    = "!IMPORTANT-DO-NOT-DELETE-cyberguard-canary.txt"`,
+    `$CanaryContent = "CyberGuard security canary. Do not delete. ID: $CanaryId"`,
+    ``,
+    `foreach ($folder in $CanaryFolders) {`,
+    `  if (Test-Path $folder) {`,
+    `    Set-Content -Path (Join-Path $folder $CanaryName) -Value $CanaryContent -Force`,
+    `    Write-Host "[CyberGuard] Canary placed: $folder"`,
+    `  }`,
+    `}`,
+    ``,
+    `# Set up file watchers`,
+    `$Watchers = @()`,
+    `foreach ($folder in $CanaryFolders) {`,
+    `  if (Test-Path $folder) {`,
+    `    $w = New-Object System.IO.FileSystemWatcher`,
+    `    $w.Path   = $folder`,
+    `    $w.Filter = $CanaryName`,
+    `    $w.NotifyFilter = [System.IO.NotifyFilters]::LastWrite -bor [System.IO.NotifyFilters]::FileName`,
+    `    $w.EnableRaisingEvents = $true`,
+    `    $Watchers += $w`,
+    `  }`,
+    `}`,
+    ``,
+    `# Alert function`,
+    `function Send-Alert { param($EventType, $FilePath)`,
+    `  Write-Host "[CyberGuard] ALERT: Canary $EventType at $FilePath"`,
+    `  $body = @{ canaryId=$CanaryId; orgName=$OrgName; event=$EventType; filePath=$FilePath;`,
+    `             hostname=$env:COMPUTERNAME; username=$env:USERNAME; timestamp=(Get-Date -Format "o") } | ConvertTo-Json`,
+    `  try { Invoke-RestMethod -Uri $WebhookUrl -Method Post -ContentType "application/json" -Body $body -TimeoutSec 10 }`,
+    `  catch { Write-Host "[CyberGuard] Warning: webhook failed: $_" }`,
+    `}`,
+    ``,
+    `foreach ($watcher in $Watchers) {`,
+    `  Register-ObjectEvent $watcher "Changed" -Action { Send-Alert "modified" $Event.SourceEventArgs.FullPath } | Out-Null`,
+    `  Register-ObjectEvent $watcher "Deleted" -Action { Send-Alert "deleted"  $Event.SourceEventArgs.FullPath } | Out-Null`,
+    `  Register-ObjectEvent $watcher "Renamed" -Action { Send-Alert "renamed"  $Event.SourceEventArgs.FullPath } | Out-Null`,
+    `}`,
+    ``,
+    `# Install as Scheduled Task for persistence`,
+    `$ScriptDir  = "$env:APPDATA\\CyberGuard"`,
+    `$ScriptPath = "$ScriptDir\\canary.ps1"`,
+    `New-Item -ItemType Directory -Force -Path $ScriptDir | Out-Null`,
+    `Copy-Item -Path $PSCommandPath -Destination $ScriptPath -Force`,
+    `$Arg      = "-WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File " + '"' + $ScriptPath + '"'`,
+    `$Action   = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $Arg`,
+    `$Trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME`,
+    `$Settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0`,
+    `try {`,
+    `  Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue`,
+    `  Register-ScheduledTask   -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -RunLevel Highest -Force | Out-Null`,
+    `  Write-Host "[CyberGuard] Installed as Scheduled Task — close this window safely"`,
+    `  Write-Host "[CyberGuard] Auto-starts at every login"`,
+    `  Write-Host "[CyberGuard] To uninstall: open Task Scheduler and delete CyberGuard-Canary"`,
+    `} catch {`,
+    `  Write-Host "[CyberGuard] Note: run as Administrator for persistent install."`,
+    `}`,
+    ``,
+    `Write-Host "[CyberGuard] Canary monitoring active."`,
+    `while ($true) { Start-Sleep -Seconds 30 }`,
+  ]
+  return lines.join('\n')
 }
 
 export function generateBashCanary({ webhookUrl, orgName, domainId }) {
