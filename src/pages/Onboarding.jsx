@@ -247,10 +247,10 @@ export default function Onboarding(props) {
   ]
 
   return (
-    <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#080b10', padding:20 }}>
+    <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-start', background:'#080b10', padding:'32px 20px 20px' }}>
       <Logo />
 
-      <div style={{ background:'#0f1420', border:'0.5px solid rgba(255,255,255,0.09)', borderRadius:14, padding:28, width:'100%', maxWidth:460, display:'flex', flexDirection:'column', gap:16 }}>
+      <div style={{ background:'#0f1420', border:'0.5px solid rgba(255,255,255,0.09)', borderRadius:14, padding:28, width:'100%', maxWidth:460, display:'flex', flexDirection:'column', gap:16, marginTop:8 }}>
 
         {/* Step indicator */}
         <div style={{ display:'flex', alignItems:'center' }}>
@@ -415,13 +415,30 @@ export default function Onboarding(props) {
 }
 
 function Logo() {
+  async function handleSignOut() {
+    await supabase.auth.signOut()
+    window.location.reload()
+  }
+
   return (
-    <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:28 }}>
-      <div style={{ width:32, height:32, borderRadius:8, background:'rgba(79,166,255,.08)', border:'1px solid rgba(79,166,255,.18)', display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
-        <div style={{ position:'absolute', width:11, height:11, border:'1.5px solid #4fa6ff', borderRadius:2, transform:'rotate(45deg)' }} />
-        <div style={{ position:'absolute', width:4.5, height:4.5, background:'#00df78', borderRadius:'50%' }} />
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%', maxWidth:460, marginBottom:28 }}>
+      {/* Left: logo mark + wordmark */}
+      <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+        <div style={{ width:32, height:32, borderRadius:8, background:'rgba(79,166,255,.08)', border:'1px solid rgba(79,166,255,.18)', display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
+          <div style={{ position:'absolute', width:11, height:11, border:'1.5px solid #4fa6ff', borderRadius:2, transform:'rotate(45deg)' }} />
+          <div style={{ position:'absolute', width:4.5, height:4.5, background:'#00df78', borderRadius:'50%' }} />
+        </div>
+        <span style={{ fontFamily:'Syne, sans-serif', fontSize:20, fontWeight:700, color:'#dde2ed' }}>CyberGuard</span>
       </div>
-      <span style={{ fontFamily:'Syne, sans-serif', fontSize:20, fontWeight:700, color:'#dde2ed' }}>CyberGuard</span>
+      {/* Right: sign out */}
+      <button
+        onClick={handleSignOut}
+        style={{ background:'none', border:'none', cursor:'pointer', fontFamily:'IBM Plex Mono, monospace', fontSize:11, color:'#3a4455', padding:'4px 8px', borderRadius:6, transition:'color .15s' }}
+        onMouseEnter={e => e.target.style.color='#6b7789'}
+        onMouseLeave={e => e.target.style.color='#3a4455'}
+      >
+        Sign out ↗
+      </button>
     </div>
   )
 }
