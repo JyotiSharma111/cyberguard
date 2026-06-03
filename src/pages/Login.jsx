@@ -2,6 +2,7 @@
  * Login — sign in, sign up (with password strength + confirm), forgot password.
  * Strong password: 8+ chars, uppercase, number, special char.
  * Confirm password field on signup.
+ * Email confirmation screen shown after signup when Supabase email confirm is ON.
  */
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabase'
@@ -63,6 +64,106 @@ function Field({ label, type = 'text', value, onChange, placeholder, autoComplet
   )
 }
 
+// ── Full-screen email confirmation screen ────────────────────────────────────
+function EmailConfirmScreen({ email, onBack }) {
+  const [resent, setResent]       = useState(false)
+  const [resending, setResending] = useState(false)
+  const [resentError, setResentError] = useState('')
+
+  async function handleResend() {
+    setResending(true)
+    setResentError('')
+    const { error } = await supabase.auth.resend({ type: 'signup', email })
+    setResending(false)
+    if (error) {
+      setResentError(error.message)
+    } else {
+      setResent(true)
+      setTimeout(() => setResent(false), 5000)
+    }
+  }
+
+  return (
+    <div style={{ minHeight:'100vh', background:'#080b10', display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
+      <div style={{ width:'100%', maxWidth:440, textAlign:'center' }}>
+
+        {/* Animated envelope icon */}
+        <div style={{
+          width:72, height:72, borderRadius:'50%',
+          background:'rgba(0,223,120,0.08)', border:'1px solid rgba(0,223,120,0.2)',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          margin:'0 auto 28px', fontSize:32,
+        }}>
+          📧
+        </div>
+
+        <div style={{ fontFamily:'Syne,sans-serif', fontSize:22, fontWeight:700, color:'#dde2ed', marginBottom:10 }}>
+          Check your inbox
+        </div>
+        <div style={{ fontSize:14, color:'#6b7789', lineHeight:1.7, marginBottom:6 }}>
+          We sent a confirmation link to:
+        </div>
+        <div style={{
+          display:'inline-block', background:'rgba(0,223,120,0.08)',
+          border:'0.5px solid rgba(0,223,120,0.2)', borderRadius:8,
+          padding:'7px 18px', fontSize:14, color:'#00df78',
+          fontFamily:'IBM Plex Mono,monospace', marginBottom:24,
+        }}>
+          {email}
+        </div>
+
+        <div style={{ fontSize:13, color:'#4a5568', lineHeight:1.7, marginBottom:32, maxWidth:340, margin:'0 auto 32px' }}>
+          Click the link in the email to activate your account.
+          Don't see it? Check your <strong style={{ color:'#6b7789' }}>spam or junk folder</strong>.
+        </div>
+
+        {/* Card */}
+        <div style={{ background:'#0f1420', border:'0.5px solid rgba(255,255,255,0.08)', borderRadius:12, padding:24, marginBottom:16 }}>
+
+          {resentError && (
+            <div style={{ background:'rgba(255,71,87,0.08)', border:'0.5px solid rgba(255,71,87,0.25)', borderRadius:7, padding:'9px 12px', fontSize:12, color:'#ff4757', marginBottom:14 }}>
+              {resentError}
+            </div>
+          )}
+
+          {resent && (
+            <div style={{ background:'rgba(0,223,120,0.08)', border:'0.5px solid rgba(0,223,120,0.2)', borderRadius:7, padding:'9px 12px', fontSize:12, color:'#00df78', marginBottom:14 }}>
+              ✓ Confirmation email resent — check your inbox
+            </div>
+          )}
+
+          <button
+            onClick={handleResend}
+            disabled={resending || resent}
+            style={{
+              width:'100%', padding:'11px',
+              background: resent ? 'rgba(0,223,120,0.06)' : 'rgba(79,166,255,0.08)',
+              border: `0.5px solid ${resent ? 'rgba(0,223,120,0.25)' : 'rgba(79,166,255,0.25)'}`,
+              borderRadius:8, fontSize:13, fontWeight:600,
+              color: resent ? '#00df78' : '#4fa6ff',
+              cursor: resending || resent ? 'default' : 'pointer',
+              transition:'all .15s', marginBottom:12,
+            }}
+          >
+            {resending ? 'Sending…' : resent ? '✓ Email resent!' : 'Resend confirmation email'}
+          </button>
+
+          <button
+            onClick={onBack}
+            style={{ width:'100%', padding:'10px', background:'transparent', border:'none', fontSize:12, color:'#3a4455', cursor:'pointer' }}
+          >
+            ← Back to sign in
+          </button>
+        </div>
+
+        <p style={{ fontSize:11, color:'#1e2530', lineHeight:1.6 }}>
+          Wrong email address? <button onClick={onBack} style={{ background:'none', border:'none', color:'#4fa6ff', cursor:'pointer', fontSize:11, padding:0 }}>Start over</button>
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function Login({ defaultMode = 'login' }) {
   const [mode, setMode]           = useState(defaultMode)
   const [email, setEmail]         = useState('')
@@ -73,6 +174,7 @@ export default function Login({ defaultMode = 'login' }) {
   const [error, setError]         = useState('')
   const [message, setMessage]     = useState('')
   const [remember, setRemember]   = useState(true)
+  const [emailSent, setEmailSent] = useState(false)   // ← NEW: confirmation screen
 
   const clear = () => { setError(''); setMessage('') }
   const strength = mode === 'signup' ? checkStrength(password) : null
@@ -111,9 +213,13 @@ export default function Login({ defaultMode = 'login' }) {
           }
         })
         if (signUpError) throw signUpError
+
+        // session is null when email confirmation is required — show full confirmation screen
         if (!data.session) {
-          setMessage('Check your email for a confirmation link. Check spam if you don\'t see it.')
+          setEmailSent(true)
+          return
         }
+        // session exists → email confirm is OFF, user is already signed in — nothing to do
 
       } else if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
@@ -132,6 +238,16 @@ export default function Login({ defaultMode = 'login' }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  // ── Show confirmation screen after signup ──────────────────────────────────
+  if (emailSent) {
+    return (
+      <EmailConfirmScreen
+        email={email}
+        onBack={() => { setEmailSent(false); setMode('login'); clear() }}
+      />
+    )
   }
 
   const titles = { login:'Welcome back', signup:'Start free — no card needed', reset:'Reset your password' }
