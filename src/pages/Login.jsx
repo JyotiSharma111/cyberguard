@@ -209,7 +209,7 @@ export default function Login({ defaultMode = 'login' }) {
           email: email.trim(), password,
           options: {
             data: { org_name: orgName.trim() },
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: 'https://app.visull.com/',
           }
         })
         if (signUpError) throw signUpError
@@ -223,7 +223,7 @@ export default function Login({ defaultMode = 'login' }) {
 
       } else if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: 'https://app.visull.com/',
         })
         if (error) throw error
         setMessage('Password reset link sent to ' + email.trim() + ' — check your inbox and spam folder. Click the link in the email to set a new password.')
