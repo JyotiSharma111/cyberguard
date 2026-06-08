@@ -209,7 +209,7 @@ export default function Login({ defaultMode = 'login' }) {
           email: email.trim(), password,
           options: {
             data: { org_name: orgName.trim() },
-            emailRedirectTo: 'https://app.visull.com/',
+            emailRedirectTo: 'https://cyberguard.visull.com/',
           }
         })
         if (signUpError) throw signUpError
