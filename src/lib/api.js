@@ -9,7 +9,7 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? ''
  * - Timeout on every request (10s default)
  */
 
-const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+const BASE = import.meta.env.VITE_API_URL ?? ''
 const DEFAULT_TIMEOUT = 15000
 const IS_DEV = import.meta.env.DEV
 
