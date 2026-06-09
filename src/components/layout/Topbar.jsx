@@ -90,7 +90,7 @@ export default function Topbar({ onMenuOpen }) {
         .update({ last_scanned: new Date().toISOString() })
         .eq('id', domainRow.id)
 
-      reload()
+      setTimeout(() => reload(), 1500)
 
       try {
         const { data: prev } = await supabase
