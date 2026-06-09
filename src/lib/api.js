@@ -10,7 +10,7 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? ''
  */
 
 const BASE = import.meta.env.VITE_API_URL ?? ''
-const DEFAULT_TIMEOUT = 15000
+const DEFAULT_TIMEOUT = 100000
 const IS_DEV = import.meta.env.DEV
 
 /**
@@ -84,7 +84,8 @@ export const scanCreds = (domain) => apiFetch(`/api/creds/${encodeURIComponent(d
  * Full scan — DNS + SSL + Creds in one call.
  * This is what the onboarding scan progress bar uses.
  */
-export const fullScan = (domain) => apiFetch(`/api/scan/${encodeURIComponent(domain)}`)
+export const fullScan = (domain) => 
+  apiFetch(`/api/scan/${encodeURIComponent(domain)}`, { timeout: 100000 })
 
 /** Check if domain TXT verification record is live in DNS */
 export const verifyDomain = (domain, token) =>

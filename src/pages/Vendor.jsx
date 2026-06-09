@@ -97,7 +97,7 @@ export default function Vendor() {
     const result = await scanVendorDomain(domain)
     if (!result.ok) {
       console.error('[Vendor] rescan failed:', result.error)
-      alert(`Scan failed: ${result.error ?? 'Unknown error'}. Make sure the API server is running (npm run server).`)
+      alert(`Scan failed: ${result.error ?? 'Unknown error'}. Please try again in a moment.`)
       setRescanning(null)
       return
     }

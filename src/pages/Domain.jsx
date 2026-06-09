@@ -160,7 +160,7 @@ export default function Domain() {
 
         {scanError && (
           <div style={{ padding:'8px 14px', background:'rgba(255,71,87,0.07)', borderBottom:'0.5px solid rgba(255,71,87,0.15)', fontFamily:'IBM Plex Mono,monospace', fontSize:10, color:'#ff4757' }}>
-            {scanError} — make sure both terminals are running: <code style={{ background:'rgba(255,255,255,0.05)', padding:'1px 5px', borderRadius:3 }}>npm run server</code>
+            {scanError} — please try again or contact support if this continues
           </div>
         )}
 

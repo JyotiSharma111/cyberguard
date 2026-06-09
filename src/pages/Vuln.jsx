@@ -115,7 +115,7 @@ export default function Vuln() {
 
       {scanError && (
         <div style={{ background:'rgba(255,71,87,0.07)', border:'0.5px solid rgba(255,71,87,0.15)', borderRadius:8, padding:'10px 14px', fontFamily:'IBM Plex Mono,monospace', fontSize:10, color:'#ff4757' }}>
-          {scanError} — make sure the API server is running: <code>npm run server</code>
+          {scanError} — please try again in a moment
         </div>
       )}
 

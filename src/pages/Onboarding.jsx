@@ -369,7 +369,7 @@ export default function Onboarding(props) {
               </div>
               <div style={{ fontFamily:'IBM Plex Mono, monospace', fontSize:10, color:'#6b7789', lineHeight:1.5 }}>
                 {scanError
-                  ? <span style={{ color:'#ffb627' }}>API server not running — start it with <code style={{ background:'#161c2a', padding:'1px 5px', borderRadius:3 }}>npm run server</code></span>
+                  ? <span style={{ color:'#ffb627' }}>Unable to reach the API server — please refresh and try again</span>
                   : <span>Scanning <strong style={{ color:'#dde2ed' }}>{domainRow?.name}</strong> {scanDone ? '— results saved' : '— please wait'}</span>
                 }
               </div>
