@@ -1,7 +1,10 @@
-# Static pages — serve directly
+# Static pages
 /privacy        /privacy.html   200
 /terms          /terms.html     200
 /sitemap.xml    /sitemap.xml    200
 
-# SPA fallback — all other routes go to React app
+# Proxy API calls to Railway (fixes phishing tracking, canary webhooks, etc.)
+/api/*    https://cyberguard-production-f12b.up.railway.app/api/:splat    200
+
+# SPA fallback
 /*              /index.html     200
