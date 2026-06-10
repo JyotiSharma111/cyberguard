@@ -87,8 +87,9 @@ function AppShell() {
   }, [state.toast])
 
   // Check for share link in URL — public route, no auth needed
-  const shareToken = window.location.pathname.match(/^\/share\/([a-f0-9]+)$/)?.[1]
-  if (shareToken) return <ShareView token={shareToken} />
+  const shareToken  = window.location.pathname.match(/^\/share\/([a-f0-9]+)$/)?.[1]
+  const phishingEdu = new URLSearchParams(window.location.search).get('phishing_education')
+  if (shareToken)  return <ShareView token={shareToken} />
   if (phishingEdu) return <PhishingEducation />
 
   // Password reset flow — Supabase sets page to __password_reset via onAuthStateChange
