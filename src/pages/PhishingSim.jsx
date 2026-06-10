@@ -22,15 +22,23 @@ export default function PhishingSim() {
   const [activeTab, setActiveTab]   = useState('new')
 
   // New campaign form
-  const [form, setForm] = useState({
-    name:      '',
-    templateId:'',
-    fromName:  state.profile?.org_name ?? 'IT Support',
-    fromEmail: `noreply@${domainName ?? 'yourdomain.com'}`,
-    recipients: '',   // comma-separated emails
+  const [form, setForm] = useState(() => {
+    try { const s = sessionStorage.getItem('cg_phishing_form'); if (s) return JSON.parse(s) } catch {}
+    return {
+      name:      '',
+      templateId:'it-password-reset',
+      fromName:  'IT Support',
+      fromEmail: 'noreply@yourdomain.com',
+      recipients: '',
+    }
   })
   const [sending, setSending] = useState(false)
   const [result, setResult]   = useState(null)
+
+  // Persist form across tab switches
+  React.useEffect(() => {
+    try { sessionStorage.setItem('cg_phishing_form', JSON.stringify(form)) } catch {}
+  }, [form])
   const [expandedCampaign, setExpandedCampaign] = useState(null)
   const [recipients, setRecipients] = useState([])
 

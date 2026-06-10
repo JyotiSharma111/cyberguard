@@ -20,7 +20,7 @@ router.post('/send', async (req, res, next) => {
     for (const recipient of recipients) {
       const r = await sendPhishingSimulation({
         campaignId, domainId, recipient, template,
-        trackingBaseUrl: baseUrl ?? process.env.FRONTEND_URL ?? 'http://localhost:5173',
+        trackingBaseUrl: 'https://cyberguard-production-f12b.up.railway.app',
         fromName, fromEmail,
       })
       results.push({ email: recipient.email, ...r })
@@ -76,7 +76,7 @@ router.get('/track/click/:campaignId/:recipientId', async (req, res) => {
     }
   }
   // Redirect to education page
-  const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173'
+  const frontendUrl = (process.env.FRONTEND_URL ?? 'https://cyberguard.visull.com').replace(/\/+$/, '')
   res.redirect(`${frontendUrl}/?phishing_education=${campaignId}&recipient=${recipientId}`)
 })
 

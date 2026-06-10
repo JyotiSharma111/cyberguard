@@ -248,27 +248,23 @@ export const FIX_GUIDES = {
 }
 
 export function getFixGuide(issueId, providerId = 'other') {
-  // Map issue IDs to guide keys
-  const keyMap = {
-    'dns-spf':     'spf',
-    'dns-dmarc':   'dmarc',
-    'hsts':        'hsts',
-    'csp':         'csp',
-    'ssl-expiry':  'ssl_expiry',
-  }
+  const id = (issueId ?? '').toLowerCase()
 
-  // Find matching guide by checking if issueId contains any key
+  // Match real scanner issue IDs to fix guide keys
+  // Scanner produces: spf-0, spf-1, dmarc-0, dmarc-1, hsts, csp,
+  //   ssl-expiry, no-a, no-mx, no-caa, open_ports, no-ptr, etc.
   let guideKey = null
-  for (const [pattern, key] of Object.entries(keyMap)) {
-    if ((issueId ?? '').toLowerCase().includes(pattern.replace('dns-',''))) {
-      guideKey = key; break
-    }
-  }
 
-  if (!guideKey) {
-    // Try direct match
+  if (id.includes('spf'))                              guideKey = 'spf'
+  else if (id.includes('dmarc'))                       guideKey = 'dmarc'
+  else if (id.includes('hsts'))                        guideKey = 'hsts'
+  else if (id.includes('csp'))                         guideKey = 'csp'
+  else if (id.includes('ssl') || id.includes('cert'))  guideKey = 'ssl_expiry'
+  else if (id.includes('port'))                        guideKey = 'open_ports'
+  else {
+    // Try direct key match as fallback
     for (const key of Object.keys(FIX_GUIDES)) {
-      if ((issueId ?? '').toLowerCase().includes(key)) {
+      if (id.includes(key.replace('_', '-')) || id.includes(key)) {
         guideKey = key; break
       }
     }

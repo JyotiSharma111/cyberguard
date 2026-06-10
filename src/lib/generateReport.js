@@ -171,8 +171,12 @@ export function generateReportHTML({ domain, scanData, orgName, scannedAt }) {
   const score   = scanData.score ?? scanData.overallScore ?? 0
   const issues  = scanData.issues ?? []
   const org     = orgName ?? domain
-  const today   = fmt(new Date().toISOString())
-  const scanDay = fmt(scannedAt)
+  const today      = fmt(new Date().toISOString())
+  const scanDay    = fmt(scannedAt)
+  const reportId   = 'CGR-' + Math.random().toString(36).substr(2,8).toUpperCase()
+  const scanTs     = scannedAt ? new Date(scannedAt) : new Date()
+  const scanDateFmt = scanTs.toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'})
+  const scanTimeFmt = scanTs.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}) + ' UTC'
   const g       = scoreGrade(score)
 
   const crit   = issues.filter(i => i.sev === 'critical')

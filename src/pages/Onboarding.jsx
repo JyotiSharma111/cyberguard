@@ -144,7 +144,7 @@ export default function Onboarding(props) {
       setVerifyStatus('not_found')
       // Give a clear error depending on what went wrong
       if (!result.error || result.error.includes('timed out') || result.error.includes('fetch')) {
-        setVerifyError('Cannot reach the API server. Make sure both terminals are running:\n1. npm run server\n2. npm run dev')
+        setVerifyError('Unable to reach the API server. Please check your internet connection and try again.')
       } else {
         setVerifyError(result.error)
       }
@@ -346,7 +346,7 @@ export default function Onboarding(props) {
             <div style={{ background:'#0a0d12', border:'0.5px solid rgba(255,255,255,.06)', borderRadius:8, padding:'10px 12px' }}>
               <div style={{ fontFamily:'IBM Plex Mono, monospace', fontSize:9, color:'#3a4455', marginBottom:6, letterSpacing:'1px', textTransform:'uppercase' }}>Status</div>
               <div style={{ fontFamily:'IBM Plex Mono, monospace', fontSize:10, color:'#6b7789', display:'flex', flexDirection:'column', gap:3 }}>
-                <span>API server: <a href="http://localhost:3001/api/health" target="_blank" rel="noopener noreferrer" style={{ color:'#4fa6ff' }}>check health</a></span>
+                <span>API server: <a href="https://cyberguard-production-f12b.up.railway.app/api/health" target="_blank" rel="noopener noreferrer" style={{ color:'#4fa6ff' }}>check health</a></span>
                 <span>Verify status: <span style={{ color: verifyStatus==='found'?'#00df78':verifyStatus==='checking'?'#4fa6ff':verifyStatus==='not_found'?'#ffb627':'#3a4455' }}>{verifyStatus}</span></span>
                 <span>Looking for TXT: <span style={{ color:'#00df78' }}>_cyberguard-verify.{domainRow.name}</span></span>
                 <span>With value: <span style={{ color:'#00df78' }}>cg-{domainRow.verify_token}</span></span>
@@ -355,7 +355,7 @@ export default function Onboarding(props) {
 
             <div style={{ fontFamily:'IBM Plex Mono, monospace', fontSize:10, color:'#3a4455', textAlign:'center' }}>
               Added the record but having trouble?{' '}
-              <a href="https://docs.cyberguard.io/verification" target="_blank" rel="noopener noreferrer" style={{ color:'#4fa6ff' }}>View guide →</a>
+              <a href="https://support.cloudflare.com/hc/en-us/articles/360019093151"  target="_blank" rel="noopener noreferrer" style={{ color:'#4fa6ff' }}>View guide →</a>
             </div>
           </>
         )}

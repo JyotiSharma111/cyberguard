@@ -193,6 +193,16 @@ a { color: inherit; text-decoration: none; }
     gap: 8px;
   }
 
+  /* Show mobile bottom nav */
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+
+  /* Add padding so content isn't hidden behind bottom nav */
+  .page-scroll {
+    padding-bottom: 56px;
+  }
+
   /* Reduce padding on pages */
   .page-padding {
     padding: 10px !important;
