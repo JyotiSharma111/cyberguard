@@ -55,7 +55,7 @@ export default function PhishingEducation() {
             🛡️ How to spot phishing emails next time
           </div>
           {[
-            'Check the sender's actual email address — not just the display name',
+            'Check the sender\'s actual email address — not just the display name',
             'Hover over links before clicking to see the real destination URL',
             'Urgency and pressure ("act now", "expires today") are classic phishing tactics',
             'Requests for passwords, payments, or personal details via email are almost always suspicious',
