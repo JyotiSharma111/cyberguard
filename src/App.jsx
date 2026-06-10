@@ -4,6 +4,7 @@ import { supabase } from './lib/supabase'
 import { Toast } from './components/ui'
 import Sidebar  from './components/layout/Sidebar'
 import Topbar   from './components/layout/Topbar'
+import PhishingEducation from './pages/PhishingEducation'
 import Login    from './pages/Login'
 import Onboarding from './pages/Onboarding'
 import Overview   from './pages/Overview'
@@ -88,6 +89,7 @@ function AppShell() {
   // Check for share link in URL — public route, no auth needed
   const shareToken = window.location.pathname.match(/^\/share\/([a-f0-9]+)$/)?.[1]
   if (shareToken) return <ShareView token={shareToken} />
+  if (phishingEdu) return <PhishingEducation />
 
   // Password reset flow — Supabase sets page to __password_reset via onAuthStateChange
   if (state.activePage === '__password_reset') return <ResetPassword />

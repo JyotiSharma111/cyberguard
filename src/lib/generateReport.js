@@ -207,8 +207,8 @@ export function generateReportHTML({ domain, scanData, orgName, scannedAt }) {
   // Industry benchmark — based on CyberGuard aggregate data across SMB scans.
   // The 660 baseline reflects median scores observed across small-medium businesses
   // in professional services, technology, and retail sectors.
-  const industryAvg   = 660
-  const vsIndustry    = score > industryAvg ? `${score - industryAvg} points above` : `${industryAvg - score} points below`
+  const industryAvg   = 62  // SMB average on CyberGuard 0-100 scale
+  const vsIndustry    = score > industryAvg ? `+${score - industryAvg} points above` : `-${industryAvg - score} points below`
   const industryLabel = score > industryAvg ? 'above SMB average' : 'below SMB average'
 
   const spfPolicy   = dns?.email?.spf?.policy  ?? 'Not configured'
@@ -269,7 +269,7 @@ export function generateReportHTML({ domain, scanData, orgName, scannedAt }) {
       id: 'ports', title: 'Open Ports',
       grade: sc.ports,
       topPct: sc.ports >= 90 ? 10 : sc.ports >= 70 ? 30 : 60,
-      description: `Shows which port numbers and services are exposed to the internet. Unnecessary open ports provide potential entry points for attackers. ${portCount} port${portCount!==1?'s':''} were observed on this domain.`,
+      description: `Shows which port numbers and services are exposed to the internet. Unnecessary open ports provide potential entry points for attackers. ${portCount} additional dangerous port${portCount!==1?'s':''} detected beyond standard web ports (80/443).`,
       findings: issuesToFindings(issues, ['port', 'Port']),
       remediation: [
         'Audit all open ports and close any that are not required for business operations',
@@ -282,7 +282,7 @@ export function generateReportHTML({ domain, scanData, orgName, scannedAt }) {
       grade: sc.pentest,
       topPct: sc.pentest >= 90 ? 15 : sc.pentest >= 70 ? 40 : 70,
       description: 'Automated checks for common security misconfigurations: exposed configuration files (.env, .git), admin panels accessible without authentication, risky HTTP methods, and missing security.txt.',
-      findings: issuesToFindings(issues, ['pentest', 'exposed', 'admin', 'git', 'env']),
+      findings: issuesToFindings(issues.filter(i => ['critical','high'].includes(i.severity)), ['pentest', 'exposed', 'admin', 'git', 'env']),
       remediation: [
         'Block access to .env, .git, and configuration files in your web server config',
         'Disable HTTP methods TRACE, PUT, DELETE unless explicitly required',
@@ -414,9 +414,9 @@ a { color:#1d4ed8 }
       <!-- vs industry -->
       <div style="padding:24px 32px;display:flex;flex-direction:column;justify-content:center;min-width:160px">
         <div style="font-family:monospace;font-size:9px;letter-spacing:1.5px;color:rgba(148,163,184,0.5);text-transform:uppercase;margin-bottom:8px">vs Industry avg</div>
-        <div style="font-size:22px;font-weight:700;color:${score>=industryAvg?'#4ade80':'#f87171'}">${score>=industryAvg?'+':'-'}${Math.abs(score-industryAvg)}</div>
+        <div style="font-size:22px;font-weight:700;color:${score>=industryAvg?'#4ade80':'#f87171'}">${vsIndustry}</div>
         <div style="font-size:11px;color:rgba(148,163,184,0.5);margin-top:3px">${industryLabel}</div>
-        <div style="font-size:10px;color:rgba(148,163,184,0.35);margin-top:8px">SMB avg: ${industryAvg} · CyberGuard data</div>
+        <div style="font-size:10px;color:rgba(148,163,184,0.35);margin-top:8px">SMB avg: ${industryAvg}/100 · CyberGuard data</div>
       </div>
     </div>
 
@@ -432,6 +432,7 @@ a { color:#1d4ed8 }
 
   <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-family:monospace;font-size:10px;color:rgba(148,163,184,0.3)">
     <span>CyberGuard Security Rating Report · ${org}</span>
+    <span style="font-size:10px;color:#9ca3af;margin-left:auto">Report ID: ${reportId}</span>
     <span>Page 1 of 1 · ${today}</span>
   </div>
 </div>
@@ -632,6 +633,34 @@ a { color:#1d4ed8 }
     It does not constitute a full penetration test, security audit, or professional security assessment.
     CyberGuard uses DNS lookups, SSL inspection, Shodan InternetDB, HaveIBeenPwned, VirusTotal, and automated HTTP checks.
     Results should be reviewed by a qualified security professional before implementing changes in production environments.
+  </p>
+  <table style="width:100%;border-collapse:collapse;margin-top:24px;font-size:11px">
+    <tr style="background:#f9fafb">
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-weight:600;color:#374151;width:30%">Report ID</td>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;color:#111827;font-family:monospace">${reportId}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-weight:600;color:#374151">Domain scanned</td>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;color:#111827">${domain}</td>
+    </tr>
+    <tr style="background:#f9fafb">
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-weight:600;color:#374151">Scan date</td>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;color:#111827">${scanDateFmt} at ${scanTimeFmt}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-weight:600;color:#374151">Scan method</td>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;color:#111827">Passive external reconnaissance — no credentials used, no internal network access, no intrusive testing</td>
+    </tr>
+    <tr style="background:#f9fafb">
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-weight:600;color:#374151">Data sources</td>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;color:#111827">DNS (RFC-compliant queries) · Shodan InternetDB · crt.sh certificate transparency · HaveIBeenPwned v3 · VirusTotal API v3 · Direct HTTP/TLS inspection</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-weight:600;color:#374151">Verify this report</td>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;color:#111827">Log in at <a href="https://cyberguard.visull.com" style="color:#0284c7">cyberguard.visull.com</a> and compare the score and findings against your live dashboard. Report ID is stored in your scan history.</td>
+    </tr>
+  </table>
+  <p style="display:none
     CyberGuard is not liable for any actions taken based on this report.
     Assessment data is a snapshot as of ${scanDay}.
   </div>
@@ -639,8 +668,8 @@ a { color:#1d4ed8 }
 
 <!-- Footer on every page via fixed positioning -->
 <div style="border-top:1px solid #e5e7eb;padding:16px 64px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#9ca3af;background:#f9fafb">
-  <span>CyberGuard Security Rating Report · ${org} · ${domain}</span>
-  <span>Generated ${today} · Confidential · Not for redistribution</span>
+  <span>CyberGuard Security Rating Report · ${org} · ${domain} · Report ID: ${reportId}</span>
+  <span>Scanned ${scanDateFmt} at ${scanTimeFmt} · Generated ${today} · Confidential</span>
 </div>
 
 </body>
