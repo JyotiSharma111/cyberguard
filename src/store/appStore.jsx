@@ -76,13 +76,29 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     // Check existing session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Timeout safety net — if Supabase doesn't respond in 8s, unblock the UI
+    const authTimeout = setTimeout(() => {
+      console.warn('[Auth] Session check timed out — forcing auth loaded')
+      send(A.AUTH_LOADED)
+    }, 8000)
+
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      clearTimeout(authTimeout)
+      if (error) {
+        console.error('[Auth] getSession error:', error.message)
+        send(A.AUTH_LOADED)
+        return
+      }
       if (session?.user) {
         send(A.AUTH_SIGNED_IN, session.user)
         loadProfile(session.user.id)
       } else {
         send(A.AUTH_LOADED)
       }
+    }).catch(err => {
+      clearTimeout(authTimeout)
+      console.error('[Auth] getSession failed:', err.message)
+      send(A.AUTH_LOADED)
     })
 
     // Listen for auth changes
