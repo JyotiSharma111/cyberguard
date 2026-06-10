@@ -170,7 +170,7 @@ export function generateReportHTML({ domain, scanData, orgName, scannedAt }) {
 
   const score   = scanData.score ?? scanData.overallScore ?? 0
   const issues  = scanData.issues ?? []
-  const org     = orgName ?? domain
+  const org     = (orgName && orgName.trim() && orgName.toLowerCase() !== 'test') ? orgName.trim() : domain
   const today      = fmt(new Date().toISOString())
   const scanDay    = fmt(scannedAt)
   const reportId   = 'CGR-' + Math.random().toString(36).substr(2,8).toUpperCase()
@@ -202,7 +202,7 @@ export function generateReportHTML({ domain, scanData, orgName, scannedAt }) {
     dkim:    scanData.dkim_score    ?? scanData.scores?.dkim    ?? 0,
     email:   scanData.email_score   ?? scanData.scores?.email   ?? 0,
     creds:   scanData.cred_score    ?? scanData.scores?.credentials ?? 100,
-    threats: scanData.threats_score ?? scanData.scores?.threats ?? 100,
+    threats: (scanData.threats_score === 0 && (!scanData.raw_virustotal || Object.keys(scanData.raw_virustotal ?? {}).length === 0)) ? 100 : (scanData.threats_score ?? scanData.scores?.threats ?? 100),
     ports:   scanData.ports_score   ?? scanData.scores?.ports   ?? 100,
     whois:   scanData.whois_score   ?? scanData.scores?.whois   ?? 100,
     pentest: scanData.pentest_score ?? scanData.scores?.pentest ?? 100,
@@ -219,7 +219,10 @@ export function generateReportHTML({ domain, scanData, orgName, scannedAt }) {
   const dmarcPolicy = dns?.email?.dmarc?.policy ?? 'Not configured'
   const sslProtocol = ssl?.protocol ?? 'N/A'
   const sslDays     = ssl?.cert?.daysLeft !== undefined ? `${ssl.cert.daysLeft} days` : 'N/A'
-  const portCount   = (shodan?.ports ?? []).length
+  const SAFE_PORTS = new Set([80, 443, 8080, 8443])
+  const allPorts     = shodan?.ports ?? []
+  const dangerPorts  = allPorts.filter(p => !SAFE_PORTS.has(Number(p)))
+  const portCount    = dangerPorts.length
   const subCount    = subdoms?.total ?? 0
   const expires     = whois?.info?.expires ? fmt(whois.info.expires) : 'N/A'
   const registrar   = whois?.info?.registrar ?? 'N/A'

@@ -105,7 +105,7 @@ export default function PhishingSim() {
       body: JSON.stringify({
         campaignId: campaign.id,
         domainId:   domainRow?.id,
-        recipients: (recips ?? recipRows).map((r, i) => ({ id: r.id ?? i, email: r.email, org: form.fromName })),
+        recipients: (recips ?? recipRows).map((r, i) => ({ id: r.id ?? null, email: r.email, org: form.fromName })),
         templateId: form.templateId,
         fromName:   form.fromName,
         fromEmail:  form.fromEmail,

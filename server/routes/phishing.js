@@ -16,29 +16,50 @@ router.post('/send', async (req, res, next) => {
     const template = PHISHING_TEMPLATES.find(t => t.id === templateId)
     if (!template) return res.status(400).json({ ok: false, error: 'Template not found' })
 
+    const SUPABASE_URL = process.env.SUPABASE_URL
+    const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY
+    const sbHeaders = {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+    }
+
     const results = []
-    for (const recipient of recipients) {
+    for (let recipient of recipients) {
+      // Ensure recipient has a real DB UUID — insert if missing
+      if (!recipient.id && SUPABASE_URL && SUPABASE_KEY) {
+        try {
+          const ins = await fetch(`${SUPABASE_URL}/rest/v1/phishing_recipients`, {
+            method: 'POST', headers: sbHeaders,
+            body: JSON.stringify({ campaign_id: campaignId, email: recipient.email })
+          })
+          const rows = await ins.json()
+          if (Array.isArray(rows) && rows[0]?.id) {
+            recipient = { ...recipient, id: rows[0].id }
+          }
+        } catch (e) {
+          console.warn('[phishing] Could not insert recipient:', e.message)
+        }
+      }
+
       const r = await sendPhishingSimulation({
         campaignId, domainId, recipient, template,
         trackingBaseUrl: 'https://cyberguard-production-f12b.up.railway.app',
         fromName, fromEmail,
       })
       results.push({ email: recipient.email, ...r })
+
       if (!r.ok) {
         console.error(`[phishing/send] Failed for ${recipient.email}:`, r.error)
-      } else if (recipient.id) {
-        // Mark recipient as sent
-        const SUPABASE_URL = process.env.SUPABASE_URL
-        const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY
-        if (SUPABASE_URL && SUPABASE_KEY) {
-          await fetch(`${SUPABASE_URL}/rest/v1/phishing_recipients?id=eq.${recipient.id}`, {
-            method: 'PATCH',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ sent_at: new Date().toISOString() })
-          }).catch(() => {})
-        }
+      } else if (recipient.id && SUPABASE_URL && SUPABASE_KEY) {
+        await fetch(`${SUPABASE_URL}/rest/v1/phishing_recipients?id=eq.${recipient.id}`, {
+          method: 'PATCH',
+          headers: { ...sbHeaders, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ sent_at: new Date().toISOString() })
+        }).catch(() => {})
       }
-      await new Promise(r => setTimeout(r, 500)) // rate limit
+      await new Promise(r => setTimeout(r, 500))
     }
     const failCount = results.filter(r => !r.ok).length
     const sentCount = results.filter(r => r.ok).length
