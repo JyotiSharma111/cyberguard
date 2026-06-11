@@ -17,7 +17,7 @@ router.post('/send', async (req, res, next) => {
     if (!template) return res.status(400).json({ ok: false, error: 'Template not found' })
 
     const SUPABASE_URL = process.env.SUPABASE_URL
-    const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY
+    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY ?? process.env.SUPABASE_ANON_KEY
     const sbHeaders = {
       'apikey': SUPABASE_KEY,
       'Authorization': `Bearer ${SUPABASE_KEY}`,
