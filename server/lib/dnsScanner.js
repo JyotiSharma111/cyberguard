@@ -158,12 +158,31 @@ export async function scanDomain(domain) {
   const { data: mtaStsTxt } = await safeResolve(dns.resolveTxt, `_mta-sts.${cleanDomain}`)
   const mtaStsRaw = (mtaStsTxt ?? []).map(a => a.join('')).find(t => t.startsWith('v=STSv1')) ?? null
 
-  // ── PTR check on first A record ───────────────────────────
-  let ptrResult = { data: null, error: 'NO_A_RECORD' }
+  // ── PTR check on mail server IP (NOT website hosting IP) ───
+  // PTR/reverse DNS is a mail-delivery concept — checking it on a
+  // website's A record produces false positives for any site on
+  // shared hosting, Vercel, Netlify, Cloudflare, etc.
+  // Only check PTR if the domain has its own mail server (MX record
+  // that isn't a third-party provider like Google/Microsoft/Zoho).
+  let ptrResult = { data: null, error: 'NOT_APPLICABLE' }
+  let ptrCheckedIP = null
   const firstIP = aResult.data?.[0] ?? null
-  if (firstIP) {
-    ptrResult = await safeResolve(dns.reverse, firstIP)
+
+  const mxHosts = (mxResult.data ?? []).map(m => (m.exchange ?? '').toLowerCase())
+  const thirdPartyMailProviders = ['google.com', 'googlemail.com', 'outlook.com', 'protection.outlook.com', 'zoho.com', 'mailgun.org', 'sendgrid.net', 'pphosted.com', 'mimecast.com']
+  const usesThirdPartyMail = mxHosts.some(h => thirdPartyMailProviders.some(p => h.includes(p)))
+
+  if (mxHosts.length > 0 && !usesThirdPartyMail) {
+    // Self-hosted mail — resolve the first MX hostname to an IP and check PTR on that
+    const { data: mxIPs } = await safeResolve(dns.resolve4, mxResult.data[0].exchange)
+    const mxIP = mxIPs?.[0] ?? null
+    if (mxIP) {
+      ptrCheckedIP = mxIP
+      ptrResult = await safeResolve(dns.reverse, mxIP)
+    }
   }
+  // If using Google/Microsoft/Zoho etc for email, PTR is managed by that
+  // provider and is not something the domain owner can or needs to configure.
 
   // ── DNSSEC: check for DS/DNSKEY records ───────────────────
   const { data: dnskeyTxt } = await safeResolve(dns.resolveTlsa, `_443._tcp.${cleanDomain}`)
@@ -182,8 +201,8 @@ export async function scanDomain(domain) {
     issues.push({ id:'no-mx', sev:'high', type:'DNS', title:'No MX record — email delivery broken', detail:'Without an MX record, no one can send email to your domain.', fix:[`Add MX record: ${cleanDomain} MX 10 mail.${cleanDomain}`, 'Or use your email provider\'s MX values (Google: aspmx.l.google.com, Microsoft: yourdomain-com.mail.protection.outlook.com)'] })
   }
 
-  if (!ptrResult.data && firstIP) {
-    issues.push({ id:'no-ptr', sev:'critical', type:'DNS', title:`PTR / reverse DNS missing for ${firstIP}`, detail:'Mail servers check reverse DNS. Missing PTR causes emails to be rejected or spam-foldered.', fix:['Log in to your hosting provider or ISP control panel', 'Find Reverse DNS / PTR settings under IP management', `Set PTR: ${firstIP} → mail.${cleanDomain}`, 'Allow 24-48h to propagate, then verify: dig -x ' + firstIP + ' +short'] })
+  if (ptrCheckedIP && !ptrResult.data) {
+    issues.push({ id:'no-ptr', sev:'high', type:'DNS', title:`PTR / reverse DNS missing for mail server ${ptrCheckedIP}`, detail:'Your domain runs its own mail server but it has no reverse DNS (PTR) record. Many receiving mail servers reject or spam-folder email from IPs without PTR.', fix:['Log in to your hosting provider or ISP control panel', 'Find Reverse DNS / PTR settings under IP management', `Set PTR: ${ptrCheckedIP} → mail.${cleanDomain}`, 'Allow 24-48h to propagate, then verify: dig -x ' + ptrCheckedIP + ' +short'] })
   }
 
   if (!caaResult.data || caaResult.data.length === 0) {
@@ -207,7 +226,7 @@ export async function scanDomain(domain) {
   let score = 100
   if (!aResult.data)                                          score -= 30
   if (!mxResult.data)                                         score -= 20
-  if (!ptrResult.data && firstIP)                             score -= 15
+  if (ptrCheckedIP && !ptrResult.data)                        score -= 10
   if (!caaResult.data || caaResult.data.length === 0)         score -= 10
   if (spfResult.policy === 'passall')                         score -= 25
   if (spfResult.policy === 'softfail' || !spfResult.valid)    score -= 10
@@ -232,7 +251,7 @@ export async function scanDomain(domain) {
       caa:    { data: caaResult.data,  error: caaResult.error },
       cname:  { data: cnameResult.data,error: cnameResult.error },
       txt:    { data: allTxt,          error: txtResult.error },
-      ptr:    { ip: firstIP, data: ptrResult.data, error: ptrResult.error },
+      ptr:    { ip: ptrCheckedIP, data: ptrResult.data, error: ptrResult.error, applicable: !!ptrCheckedIP },
     },
     email: {
       spf:    spfResult,
