@@ -8,10 +8,8 @@ const SUPABASE_URL  = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 if (!SUPABASE_URL || !SUPABASE_ANON) {
-  throw new Error(
-    '[CyberGuard] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in .env.local\n' +
-    'Copy .env.example to .env.local and fill in your Supabase project values.'
-  )
+  console.error('[CyberGuard] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY')
+  // Don't throw — let the app load and show a meaningful error to the user
 }
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {

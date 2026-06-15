@@ -50,7 +50,7 @@ const GATE_MESSAGES = {
   staff_emails:      { message: 'Staff email checking requires Pro ($49/mo)', upgrade: 'pro' },
   score_history:     { message: 'Score history requires Pro ($49/mo)', upgrade: 'pro' },
   api_access:        { message: 'API access requires Business ($99/mo)', upgrade: 'business' },
-  compliance_pack:   { message: 'T-Mobile compliance pack requires Business ($99/mo)', upgrade: 'business' },
+  compliance_pack:   { message: 'Vendor compliance pack requires Business ($99/mo)', upgrade: 'business' },
   add_domain:        { message: 'You have reached your domain limit. Upgrade to add more.', upgrade: 'pro' },
   add_integration:   { message: 'You have reached your integration limit. Upgrade to add more.', upgrade: 'pro' },
   phishing_campaign: { message: 'Upgrade to Pro for unlimited phishing simulations', upgrade: 'pro' },

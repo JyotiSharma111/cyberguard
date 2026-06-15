@@ -69,7 +69,7 @@ export const PLANS = {
       'Remediation tracker',
       '14-day free trial',
     ],
-    missing: ['API access', 'Branded PDF reports', 'Up to 10 domains', 'T-Mobile compliance pack']
+    missing: ['API access', 'Branded PDF reports', 'Up to 10 domains', 'Vendor compliance pack']
   },
   business: {
     name:        'Business',
@@ -93,7 +93,7 @@ export const PLANS = {
       'Priority support (24h SLA)',
       '100 vendor risk scans',
       'All cloud integrations',
-      'T-Mobile vendor compliance pack',
+      'Vendor compliance pack',
       'Unlimited canary deployments',
       '14-day free trial',
     ],
@@ -138,7 +138,7 @@ export const GATE_MESSAGES = {
   score_history:    { title: 'Score history — Pro feature', desc: 'Upgrade to Pro ($49/mo) to see your security score trend over 90 days.' },
   weekly_digest:    { title: 'Weekly digest — Pro feature', desc: 'Upgrade to Pro ($49/mo) to receive weekly email security summaries.' },
   api_access:       { title: 'API access — Business feature', desc: 'Upgrade to Business ($99/mo) for REST API access.' },
-  compliance_pack:  { title: 'T-Mobile compliance pack — Business feature', desc: 'Upgrade to Business ($99/mo) for the one-click T-Mobile vendor compliance export.' },
+  compliance_pack:  { title: 'Vendor compliance pack — Business feature', desc: 'Upgrade to Business ($99/mo) for the one-click vendor compliance export.' },
   canary_deploy:    { title: 'Canary limit reached', desc: 'Upgrade to Pro ($49/mo) to deploy canary scripts on up to 10 machines.' },
   phishing_campaign:{ title: 'Phishing campaign limit reached', desc: 'Upgrade to Pro ($49/mo) for unlimited phishing simulations.' },
 }

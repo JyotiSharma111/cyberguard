@@ -226,7 +226,7 @@ export default function Integrations() {
         <StatCard label="Connected"      value={connected.length} note={`of ${Object.keys(INTEGRATION_DEFS).length} available`} accent="bl" />
         <StatCard label="Avg cloud score" value={avgScore !== null ? `${avgScore}/100` : '—'} note="Across integrations" accent={avgScore>=80?'gr':avgScore>=60?'am':'re'} />
         <StatCard label="Cloud issues"   value={totalIssues.length} note={`${critCount} critical`} accent={critCount>0?'re':totalIssues.length>0?'am':'gr'} />
-        <StatCard label="T-Mobile req."  value={connected.length >= 2 ? '✓ Partial' : 'Add integrations'} note="Cloud & identity layer" accent={connected.length>=2?'gr':'am'} />
+        <StatCard label="Cloud coverage"  value={connected.length >= 2 ? '✓ Good' : 'Add integrations'} note="Cloud & identity layer" accent={connected.length>=2?'gr':'am'} />
       </Grid>
 
       {Object.entries(INTEGRATION_DEFS).map(([type, def]) => {

@@ -1,6 +1,10 @@
 # Static pages
-/privacy   /privacy.html  200
-/terms     /terms.html    200
+/privacy        /privacy.html   200
+/terms          /terms.html     200
+/sitemap.xml    /sitemap.xml    200
 
-# SPA fallback — must use 200 with no trailing rules conflict
-/*         /index.html    200
+# Proxy API calls to Railway (fixes phishing tracking, canary webhooks, etc.)
+/api/*    https://cyberguard-production-f12b.up.railway.app/api/:splat    200
+
+# SPA fallback
+/*              /index.html     200

@@ -41,10 +41,8 @@ const TESTIMONIALS = [
 const FAQS = [
   { q:'What does CyberGuard actually scan?',
     a:'9 checks on every scan: DNS records, SSL certificate, email authentication (SPF/DKIM/DMARC/BIMI), HTTP security headers, open ports via Shodan, subdomain discovery, WHOIS/domain expiry, credential breaches (HIBP), and domain reputation (VirusTotal). All passive — we never touch your servers.' },
-  { q:'Does CyberGuard satisfy T-Mobile\'s vendor security requirement?',
-    a:'Yes. CyberGuard covers cloud service monitoring (M365, AWS, GitHub, Cloudflare), 24/7 automated detection with instant email/Slack/Teams alerts, IRP generation, and ransomware canary scripts. Combined with naming yourself as on-call responder in your IRP, this satisfies T-Mobile\'s vendor incident management requirement under the "automated monitoring tools" option.' },
   { q:'How does this compare to enterprise security platforms?',
-    a:'Enterprise security platforms typically charge $900–$3,000/month and require a sales call, annual contract, and dedicated IT staff. CyberGuard covers the same technical controls at $49/month with instant self-serve signup. The main difference is enterprise platforms include a 24/7 human SOC team — CyberGuard uses automated monitoring with instant alerts, which satisfies most SMB compliance requirements including T-Mobile\'s vendor programme.' },
+    a:'Enterprise security platforms typically charge $900–$3,000/month and require a sales call, annual contract, and dedicated IT staff. CyberGuard covers the same technical controls at $49/month with instant self-serve signup. The main difference is enterprise platforms include a 24/7 human SOC team — CyberGuard uses automated monitoring with instant alerts, which satisfies most SMB compliance requirements.' },
   { q:'Do I need to install anything?',
     a:'No. Everything is passive scanning of publicly available data. Add your domain, verify ownership with one DNS record, and we do the rest. The only optional install is a one-command ransomware canary script for your own machines.' },
   { q:'How is the free tier?',
@@ -205,7 +203,7 @@ export default function Landing() {
       {/* Social proof bar */}
       <div style={{ borderTop:'0.5px solid rgba(255,255,255,0.06)', borderBottom:'0.5px solid rgba(255,255,255,0.06)', padding:'14px 48px', display:'flex', alignItems:'center', justifyContent:'center', gap:40, background:'rgba(255,255,255,0.02)', flexWrap:'wrap' }}>
         {[
-          '🔒 Used by T-Mobile vendors',
+          '🔒 Used by 500+ SMBs',
           '📊 Enterprise-grade security at SMB pricing',
           '⚡ 9 scanners in one tool',
           '🌍 GDPR-conscious — EU-accessible',
@@ -399,7 +397,7 @@ export default function Landing() {
             Scan my domain free →
           </button>
           <div style={{ fontSize:12, color:'#3a4455', marginTop:14 }}>
-            Trusted by T-Mobile vendors, MSPs, and 500+ businesses
+            Trusted by MSPs and growing businesses everywhere
           </div>
         </div>
       </section>
