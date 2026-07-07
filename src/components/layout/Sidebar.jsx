@@ -33,6 +33,7 @@ const NAV = [
   { id: 'account',      label: 'Account & Data',        icon: 'ti-user-circle' },
   { id: 'billing',      label: 'Billing & Plans',       icon: 'ti-credit-card' },
   { id: 'guides',       label: 'Setup Guides',          icon: 'ti-book' },
+  { id: 'badge',        label: 'Trust Badge',            icon: 'ti-shield-check' },
 ]
 
 

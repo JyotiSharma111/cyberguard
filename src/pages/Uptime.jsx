@@ -188,8 +188,7 @@ export default function Uptime() {
       {checks.length === 0 && (
         <div style={{ background:'rgba(255,182,39,0.07)', border:'0.5px solid rgba(255,182,39,0.2)', borderRadius:8, padding:'12px 14px', fontFamily:'IBM Plex Mono,monospace', fontSize:10, color:'#ffb627', lineHeight:1.8 }}>
           <strong>To enable automatic 5-minute checks:</strong><br/>
-          Set up a cron job to call this URL every 5 minutes — replace <code style={{ background:'rgba(255,255,255,0.06)', padding:'1px 5px', borderRadius:3 }}>YOUR_CRON_SECRET</code> with the CRON_SECRET value from your Railway environment variables:<br/>
-          <code style={{ display:'block', background:'rgba(255,255,255,0.04)', padding:'6px 10px', borderRadius:5, margin:'6px 0', fontSize:10, wordBreak:'break-all' }}>GET https://cyberguard-production-f12b.up.railway.app/api/uptime/run?secret=YOUR_CRON_SECRET</code>
+          Set up a cron job to call: <code style={{ background:'rgba(255,255,255,0.06)', padding:'1px 5px', borderRadius:3 }}>POST /api/uptime/run?secret=YOUR_CRON_SECRET</code> every 5 minutes.<br/>
           Services: EasyCron (free), GitHub Actions (free), Render cron jobs, Railway cron.<br/>
           Or call it manually with the "Check now" button above.
         </div>

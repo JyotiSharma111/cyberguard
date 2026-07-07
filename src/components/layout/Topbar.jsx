@@ -28,6 +28,7 @@ const PAGE_META = {
   billing:      ['ti-credit-card',      'Billing & Plans'],
   integrations: ['ti-plug',             'Cloud & Identity'],
   guides:       ['ti-book',             'Setup Guides'],
+  badge:        ['ti-shield-check',     'Trust Badge'],
   threatalerts: ['ti-radar-2',          'Threat Alerts'],
   documents:    ['ti-file-text',        'Policy Documents'],
   phishing:     ['ti-fish-hook',        'Phishing Simulations'],
@@ -59,7 +60,7 @@ export default function Topbar({ onMenuOpen }) {
       const score = Math.min(100, Math.max(0, sd.overallScore ?? 0))
       const grade = score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F'
 
-      const { error: insertError } = await supabase.from('scan_results').insert({
+      await supabase.from('scan_results').insert({
         domain_id:    domainRow.id,
         score, grade,
         dns_score:    sd.scores?.dns          ?? 0,
@@ -85,11 +86,6 @@ export default function Topbar({ onMenuOpen }) {
         pentest_score:  sd.scores?.pentest    ?? 0,
         raw_pentest:    sd.pentest            ?? {},
       })
-
-      if (insertError) {
-        console.error('[Scan] Insert to scan_results FAILED:', insertError.message, insertError)
-        send(A.TOAST, { msg: `Scan ran but failed to save: ${insertError.message}`, type: 'bad' })
-      }
 
       await supabase.from('domains')
         .update({ last_scanned: new Date().toISOString() })

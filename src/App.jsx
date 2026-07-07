@@ -5,6 +5,8 @@ import { Toast } from './components/ui'
 import Sidebar  from './components/layout/Sidebar'
 import Topbar   from './components/layout/Topbar'
 import PhishingEducation from './pages/PhishingEducation'
+import Badge        from './pages/Badge'
+import VerifyBadge  from './pages/VerifyBadge'
 import Login    from './pages/Login'
 import Onboarding from './pages/Onboarding'
 import Overview   from './pages/Overview'
@@ -47,6 +49,7 @@ const PAGES = {
   phishing:      PhishingSim,
   uptime:        Uptime,
   canary:        Canary,
+  badge:         Badge,
 }
 
 function AppShell() {
@@ -87,8 +90,10 @@ function AppShell() {
   }, [state.toast])
 
   // Check for share link in URL — public route, no auth needed
-  const shareToken  = window.location.pathname.match(/^\/share\/([a-f0-9]+)$/)?.[1]
+  const verifyMatch  = window.location.pathname.match(/^\/verify\/(.+)$/)
+  const shareToken   = window.location.pathname.match(/^\/share\/([a-f0-9]+)$/)?.[1]
   const phishingEdu = new URLSearchParams(window.location.search).get('phishing_education')
+  if (verifyMatch) return <VerifyBadge />
   if (shareToken)  return <ShareView token={shareToken} />
   if (phishingEdu) return <PhishingEducation />
 

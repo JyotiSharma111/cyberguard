@@ -28,6 +28,7 @@ import phishingRoutes      from './routes/phishing.js'
 import uptimeRoutes        from './routes/uptime.js'
 import canaryRoutes        from './routes/canary.js'
 import authRoutes          from './routes/auth.js'
+import badgeRoutes         from './routes/badge.js'
 
 const app  = express()
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
@@ -84,6 +85,7 @@ app.use('/api/phishing',     phishingRoutes)
 app.use('/api/uptime',       uptimeRoutes)
 app.use('/api/canary',       canaryRoutes)
 app.use('/api/auth',         authRoutes)
+app.use('/api/badge',        badgeRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
