@@ -28,7 +28,6 @@ import phishingRoutes      from './routes/phishing.js'
 import uptimeRoutes        from './routes/uptime.js'
 import canaryRoutes        from './routes/canary.js'
 import authRoutes          from './routes/auth.js'
-import badgeRoutes         from './routes/badge.js'
 
 const app  = express()
 const PORT = parseInt(process.env.PORT ?? '3001', 10)

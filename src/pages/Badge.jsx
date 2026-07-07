@@ -7,14 +7,24 @@ import { useScanData } from '../hooks/useScanData'
 
 export default function Badge() {
   const { state } = useApp()
-  const { domainName, scanData } = useScanData()
+  const { domainName } = useScanData()
   const [copied, setCopied] = useState(null)
   const [style, setStyle] = useState('full')
+  const [badgeData, setBadgeData] = useState(null)
   const apiBase = import.meta.env.VITE_API_URL ?? 'https://cyberguard-production-f12b.up.railway.app'
   const frontendBase = 'https://cyberguard.visull.com'
 
-  const score = scanData?.score ?? 0
-  const grade = score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F'
+  // Fetch live badge data from API
+  React.useEffect(() => {
+    if (!domainName || domainName === '—') return
+    fetch(`${apiBase}/api/badge/${domainName}`)
+      .then(r => r.json())
+      .then(d => { if (d.ok) setBadgeData(d) })
+      .catch(() => {})
+  }, [domainName, apiBase])
+
+  const score = badgeData?.score ?? 0
+  const grade = badgeData?.grade ?? 'F'
   const fill = score >= 90 ? '#059669' : score >= 75 ? '#0284c7' : score >= 60 ? '#d97706' : score >= 40 ? '#dc2626' : '#991b1b'
 
   const badgeUrl  = `${apiBase}/api/badge/${domainName}/svg?style=${style}`
