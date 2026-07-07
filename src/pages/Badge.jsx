@@ -27,7 +27,7 @@ export default function Badge() {
   const grade = badgeData?.grade ?? 'F'
   const fill = score >= 90 ? '#059669' : score >= 75 ? '#0284c7' : score >= 60 ? '#d97706' : score >= 40 ? '#dc2626' : '#991b1b'
 
-  const badgeUrl  = `${apiBase}/api/badge/${domainName}/svg?style=${style}`
+  const badgeUrl  = `${apiBase}/api/badge/${domainName}/svg?style=${style}&v=${Math.floor(Date.now()/3600000)}`
   const verifyUrl = `${frontendBase}/verify/${domainName}`
 
   const snippets = {
